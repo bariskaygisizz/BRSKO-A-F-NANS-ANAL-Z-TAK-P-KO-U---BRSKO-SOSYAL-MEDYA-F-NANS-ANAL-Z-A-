@@ -58,6 +58,12 @@ app.post('/api/chat', async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        return res.status(401).json({
+          error: 'OpenRouter API anahtari gecersiz. OPENROUTER_API_KEY degerini yeni bir anahtarla degistirin.',
+        });
+      }
+
       return res.status(response.status).json({
         error: data.error?.message || 'OpenRouter request failed',
         detail: data,
