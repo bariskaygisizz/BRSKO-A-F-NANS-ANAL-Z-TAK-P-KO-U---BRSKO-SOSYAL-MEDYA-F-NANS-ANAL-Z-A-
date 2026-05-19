@@ -1,19 +1,3 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import fetch from 'node-fetch';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-dotenv.config();
-
-const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use(cors());
-app.use(express.json());
-
 const SYSTEM_PROMPT = `Sen BRSKO AI adinda, yapay zeka destekli kisisel finans asistanisin.
 Gorevin:
 - Kullanicinin finansal sorularina net, zeki ve motive edici yanitlar vermek
@@ -24,15 +8,18 @@ Gorevin:
 - Finansal konularda kisa bir risk uyarisi eklemek
 Asla robot gibi konusma. Gercek bir finans kocu gibi davran.`;
 
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { messages = [] } = req.body;
-    const apiKey = process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
+  try {
+    const apiKey = process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
     if (!apiKey) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
+    const { messages = [] } = req.body || {};
     const payload = {
       model: process.env.OPENROUTER_MODEL || 'google/gemma-3-27b-it:free',
       messages: [
@@ -49,14 +36,13 @@ app.post('/api/chat', async (req, res) => {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.PUBLIC_SITE_URL || `http://localhost:${process.env.PORT || 3002}`,
+        'HTTP-Referer': process.env.PUBLIC_SITE_URL || req.headers.origin || 'https://brsko-ai.vercel.app',
         'X-Title': 'BRSKO AI Finance',
       },
       body: JSON.stringify(payload),
     });
 
     const data = await response.json();
-
     if (!response.ok) {
       return res.status(response.status).json({
         error: data.error?.message || 'OpenRouter request failed',
@@ -69,24 +55,8 @@ app.post('/api/chat', async (req, res) => {
       return res.status(500).json({ error: 'Unexpected AI response', detail: data });
     }
 
-    return res.json({ reply });
+    return res.status(200).json({ reply });
   } catch (error) {
-    console.error('Server error:', error);
     return res.status(500).json({ error: error.message });
   }
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', provider: 'OpenRouter' });
-});
-
-app.use(express.static(path.join(__dirname, 'dist')));
-
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
-  console.log(`BRSKO AI server listening on http://localhost:${PORT}`);
-});
+}
