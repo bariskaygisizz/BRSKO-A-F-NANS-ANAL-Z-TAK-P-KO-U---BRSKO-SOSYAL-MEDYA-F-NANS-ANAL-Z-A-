@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "fal.media" },
     ],
   },
-  serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3"],
+  serverExternalPackages: [],
 };
 
 export default nextConfig;

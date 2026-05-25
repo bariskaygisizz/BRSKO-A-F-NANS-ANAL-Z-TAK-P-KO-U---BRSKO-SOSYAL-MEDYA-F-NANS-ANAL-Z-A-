@@ -4,10 +4,10 @@ import { Play, Download, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-re
 interface Video {
   id: string;
   title: string;
-  videoUrl: string | null;
-  imageUrl: string | null;
+  videoUrl?: string | null;
+  imageUrl?: string | null;
   status: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 interface Props {
