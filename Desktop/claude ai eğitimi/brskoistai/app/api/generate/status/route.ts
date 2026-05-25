@@ -5,6 +5,32 @@ import { auth } from "@/lib/auth";
 import { store } from "@/lib/store";
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+const FAL_MODEL = "fal-ai/kling-video/v1/standard/text-to-video";
+
+async function pollFalTask(requestId: string): Promise<{ videoUrl: string | null; failed: boolean }> {
+  // Check status first
+  const statusRes = await fetch(`https://queue.fal.run/${FAL_MODEL}/requests/${requestId}/status`, {
+    headers: { Authorization: `Key ${process.env.FAL_API_KEY}` },
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => null);
+
+  if (!statusRes || !statusRes.ok) return { videoUrl: null, failed: false };
+  const statusData = await statusRes.json();
+
+  if (statusData.status === "FAILED") return { videoUrl: null, failed: true };
+  if (statusData.status !== "COMPLETED") return { videoUrl: null, failed: false };
+
+  // Get result
+  const resultRes = await fetch(`https://queue.fal.run/${FAL_MODEL}/requests/${requestId}`, {
+    headers: { Authorization: `Key ${process.env.FAL_API_KEY}` },
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => null);
+
+  if (!resultRes || !resultRes.ok) return { videoUrl: null, failed: false };
+  const result = await resultRes.json();
+  const url = result?.video?.url ?? null;
+  return { videoUrl: url, failed: !url };
+}
 
 function klingJWT(): string {
   const apiKey = process.env.KLING_API_KEY!;
@@ -76,9 +102,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ status: "failed", videoUrl: null });
     }
 
-    // Kling AI path — just poll the task, no throttle needed
-    if (data.engine === "kling" && data.klingTaskId) {
-      const { videoUrl, failed } = await pollKlingTask(data.klingTaskId);
+    // fal.ai — sadece task_id poll et
+    if (data.engine === "fal" && data.taskId) {
+      const { videoUrl, failed } = await pollFalTask(data.taskId);
       if (failed) {
         await store.updateVideo(videoId, { status: "failed" });
         await del(blob.url, { token: TOKEN });
@@ -89,14 +115,32 @@ export async function GET(req: Request) {
         await del(blob.url, { token: TOKEN });
         return NextResponse.json({ status: "completed", videoUrl });
       }
-      // Update retry counter so we know we're actively polling
-      await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1, lastPolled: new Date().toISOString() }), {
+      await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1 }), {
+        access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN,
+      });
+      return NextResponse.json({ status: "processing", videoUrl: null, retries: data.retries + 1, engine: "fal" });
+    }
+
+    // Kling AI direkt
+    if (data.engine === "kling" && data.taskId) {
+      const { videoUrl, failed } = await pollKlingTask(data.taskId);
+      if (failed) {
+        await store.updateVideo(videoId, { status: "failed" });
+        await del(blob.url, { token: TOKEN });
+        return NextResponse.json({ status: "failed", videoUrl: null });
+      }
+      if (videoUrl) {
+        await store.updateVideo(videoId, { status: "completed", videoUrl });
+        await del(blob.url, { token: TOKEN });
+        return NextResponse.json({ status: "completed", videoUrl });
+      }
+      await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1 }), {
         access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN,
       });
       return NextResponse.json({ status: "processing", videoUrl: null, retries: data.retries + 1, engine: "kling" });
     }
 
-    // HuggingFace fallback path — throttle to once per 50s
+    // HuggingFace yedek — 50 saniyede bir dene
     const lastTried = data.lastTried ? Date.now() - new Date(data.lastTried).getTime() : 99999;
     if (lastTried < 50000) {
       return NextResponse.json({ status: "processing", videoUrl: null, retries: data.retries, engine: "hf" });
@@ -121,7 +165,6 @@ export async function GET(req: Request) {
     const videoUrl = await uploadToTmp(buf);
     await store.updateVideo(videoId, { status: "completed", videoUrl });
     await del(blob.url, { token: TOKEN });
-
     return NextResponse.json({ status: "completed", videoUrl });
   } catch {
     return NextResponse.json({ status: "processing", videoUrl: null });

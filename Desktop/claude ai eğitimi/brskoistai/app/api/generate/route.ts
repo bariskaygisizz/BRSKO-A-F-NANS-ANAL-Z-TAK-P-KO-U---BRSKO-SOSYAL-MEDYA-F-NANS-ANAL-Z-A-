@@ -7,6 +7,20 @@ import Groq from "groq-sdk";
 
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+const FAL_KEY = process.env.FAL_API_KEY;
+const FAL_MODEL = "fal-ai/kling-video/v1/standard/text-to-video";
+
+async function submitFalTask(prompt: string): Promise<string | null> {
+  const res = await fetch(`https://queue.fal.run/${FAL_MODEL}`, {
+    method: "POST",
+    headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: prompt.slice(0, 2500), duration: "5", aspect_ratio: "9:16" }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data?.request_id ?? null;
+}
 
 function klingJWT(): string {
   const apiKey = process.env.KLING_API_KEY!;
@@ -33,10 +47,7 @@ async function submitKlingTask(prompt: string): Promise<string | null> {
 async function callOpenRouter(systemMsg: string, userMsg: string): Promise<any> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-    },
+    headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "google/gemini-flash-1.5",
       messages: [{ role: "system", content: systemMsg }, { role: "user", content: userMsg }],
@@ -120,15 +131,24 @@ export async function POST(req: Request) {
         store.updateVideo(video.id, { status: "failed" })
       );
     } else {
-      // Try to submit to Kling AI immediately for fast generation
-      let klingTaskId: string | null = null;
-      if (process.env.KLING_API_KEY && process.env.KLING_API_SECRET) {
-        try { klingTaskId = await submitKlingTask(prompt); } catch { /**/ }
+      let engine = "hf";
+      let taskId: string | null = null;
+
+      // fal.ai öncelikli (en hızlı, $10 ücretsiz kredi)
+      if (FAL_KEY) {
+        taskId = await submitFalTask(prompt).catch(() => null);
+        if (taskId) engine = "fal";
+      }
+
+      // Kling AI direkt (yedek)
+      if (!taskId && process.env.KLING_API_KEY && process.env.KLING_API_SECRET) {
+        taskId = await submitKlingTask(prompt).catch(() => null);
+        if (taskId) engine = "kling";
       }
 
       await put(`queue/${video.id}.json`, JSON.stringify({
-        videoId: video.id, prompt, retries: 0, type, createdAt: new Date().toISOString(),
-        ...(klingTaskId ? { klingTaskId, engine: "kling" } : { engine: "hf" }),
+        videoId: video.id, prompt, retries: 0, type, engine, taskId,
+        createdAt: new Date().toISOString(),
       }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
     }
 
