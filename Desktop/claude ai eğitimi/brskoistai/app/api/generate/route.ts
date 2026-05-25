@@ -7,6 +7,25 @@ import Groq from "groq-sdk";
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
+async function callOpenRouter(systemMsg: string, userMsg: string): Promise<any> {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-flash-1.5",
+      messages: [{ role: "system", content: systemMsg }, { role: "user", content: userMsg }],
+      response_format: { type: "json_object" },
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) throw new Error("OpenRouter error");
+  const data = await res.json();
+  return JSON.parse(data.choices[0].message.content || "{}");
+}
+
 async function uploadToTmp(buf: ArrayBuffer, mime: string, name: string): Promise<string> {
   const form = new FormData();
   form.append("file", new Blob([buf], { type: mime }), name);
@@ -33,11 +52,16 @@ async function generateImage(prompt: string): Promise<string> {
 
 async function buildPrompt(text: string, type: string, withAvatar: boolean) {
   const avatarHint = withAvatar ? " Include a UGC creator person holding the product." : "";
+  const sysMsg = type === "image"
+    ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
+    : "Write a short English cinematic video prompt (max 150 chars) for UGC. Return JSON: {prompt: string, hashtags: string[]}";
+  // Try OpenRouter (Gemini Flash) first
+  if (process.env.OPENROUTER_API_KEY) {
+    try { return await callOpenRouter(sysMsg, text + avatarHint); } catch { /**/ }
+  }
+  // Fallback to Groq
   if (groq) {
     try {
-      const sysMsg = type === "image"
-        ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
-        : "Write a short English cinematic video prompt (max 150 chars) for UGC. Return JSON: {prompt: string, hashtags: string[]}";
       const res = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [{ role: "system", content: sysMsg }, { role: "user", content: text + avatarHint }],
