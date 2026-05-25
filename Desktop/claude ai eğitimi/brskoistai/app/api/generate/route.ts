@@ -1,11 +1,34 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { createHmac } from "crypto";
 import { auth } from "@/lib/auth";
 import { store } from "@/lib/store";
 import Groq from "groq-sdk";
 
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+
+function klingJWT(): string {
+  const apiKey = process.env.KLING_API_KEY!;
+  const apiSecret = process.env.KLING_API_SECRET!;
+  const now = Math.floor(Date.now() / 1000);
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ iss: apiKey, exp: now + 1800, nbf: now - 5 })).toString("base64url");
+  const sig = createHmac("sha256", apiSecret).update(`${header}.${payload}`).digest("base64url");
+  return `${header}.${payload}.${sig}`;
+}
+
+async function submitKlingTask(prompt: string): Promise<string | null> {
+  const res = await fetch("https://api.klingai.com/v1/videos/text2video", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${klingJWT()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: prompt.slice(0, 2500), duration: "5", aspect_ratio: "9:16" }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data?.data?.task_id ?? null;
+}
 
 async function callOpenRouter(systemMsg: string, userMsg: string): Promise<any> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -55,11 +78,9 @@ async function buildPrompt(text: string, type: string, withAvatar: boolean) {
   const sysMsg = type === "image"
     ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
     : "Write a short English cinematic video prompt (max 150 chars) for UGC. Return JSON: {prompt: string, hashtags: string[]}";
-  // Try OpenRouter (Gemini Flash) first
   if (process.env.OPENROUTER_API_KEY) {
     try { return await callOpenRouter(sysMsg, text + avatarHint); } catch { /**/ }
   }
-  // Fallback to Groq
   if (groq) {
     try {
       const res = await groq.chat.completions.create({
@@ -93,16 +114,21 @@ export async function POST(req: Request) {
     });
 
     if (type === "image") {
-      // Images are fast enough to generate inline
       generateImage(prompt).then(videoUrl =>
         store.updateVideo(video.id, { status: "completed", videoUrl })
       ).catch(() =>
         store.updateVideo(video.id, { status: "failed" })
       );
     } else {
-      // Videos go into the cron queue
+      // Try to submit to Kling AI immediately for fast generation
+      let klingTaskId: string | null = null;
+      if (process.env.KLING_API_KEY && process.env.KLING_API_SECRET) {
+        try { klingTaskId = await submitKlingTask(prompt); } catch { /**/ }
+      }
+
       await put(`queue/${video.id}.json`, JSON.stringify({
         videoId: video.id, prompt, retries: 0, type, createdAt: new Date().toISOString(),
+        ...(klingTaskId ? { klingTaskId, engine: "kling" } : { engine: "hf" }),
       }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
     }
 
