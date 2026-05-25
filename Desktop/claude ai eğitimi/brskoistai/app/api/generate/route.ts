@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { createHmac } from "crypto";
 import { auth } from "@/lib/auth";
 import { store } from "@/lib/store";
 import Groq from "groq-sdk";
@@ -8,40 +7,27 @@ import Groq from "groq-sdk";
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const FAL_KEY = process.env.FAL_API_KEY;
-const FAL_MODEL = "fal-ai/minimax/video-01";
 
-async function submitFalTask(prompt: string): Promise<string | null> {
-  const res = await fetch(`https://queue.fal.run/${FAL_MODEL}`, {
+// Fast model: ~5-10 seconds
+const FAL_FAST_MODEL = "fal-ai/fast-animatediff/v2/turbo";
+// Quality model: ~30-60 seconds (fallback)
+const FAL_QUALITY_MODEL = "fal-ai/minimax/video-01";
+
+async function submitFal(prompt: string, model: string): Promise<string | null> {
+  const body = model === FAL_FAST_MODEL
+    ? { prompt: prompt.slice(0, 500), num_inference_steps: 4, guidance_scale: 1.0, num_frames: 16 }
+    : { prompt: prompt.slice(0, 2000) };
+
+  const res = await fetch(`https://queue.fal.run/${model}`, {
     method: "POST",
     headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: prompt.slice(0, 2000) }),
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!res.ok) return null;
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(12000),
+  }).catch(() => null);
+
+  if (!res || !res.ok) return null;
   const data = await res.json();
   return data?.request_id ?? null;
-}
-
-function klingJWT(): string {
-  const apiKey = process.env.KLING_API_KEY!;
-  const apiSecret = process.env.KLING_API_SECRET!;
-  const now = Math.floor(Date.now() / 1000);
-  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
-  const payload = Buffer.from(JSON.stringify({ iss: apiKey, exp: now + 1800, nbf: now - 5 })).toString("base64url");
-  const sig = createHmac("sha256", apiSecret).update(`${header}.${payload}`).digest("base64url");
-  return `${header}.${payload}.${sig}`;
-}
-
-async function submitKlingTask(prompt: string): Promise<string | null> {
-  const res = await fetch("https://api.klingai.com/v1/videos/text2video", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${klingJWT()}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: prompt.slice(0, 2500), duration: "5", aspect_ratio: "9:16" }),
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data?.data?.task_id ?? null;
 }
 
 async function callOpenRouter(systemMsg: string, userMsg: string): Promise<any> {
@@ -53,7 +39,7 @@ async function callOpenRouter(systemMsg: string, userMsg: string): Promise<any> 
       messages: [{ role: "system", content: systemMsg }, { role: "user", content: userMsg }],
       response_format: { type: "json_object" },
     }),
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error("OpenRouter error");
   const data = await res.json();
@@ -69,14 +55,15 @@ async function uploadToTmp(buf: ArrayBuffer, mime: string, name: string): Promis
 }
 
 async function generateImage(prompt: string): Promise<string> {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 5; i++) {
     const res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.HF_TOKEN}`, "Content-Type": "application/json", "x-wait-for-model": "true" },
       body: JSON.stringify({ inputs: prompt.slice(0, 300) }),
       signal: AbortSignal.timeout(50000),
-    });
-    if (res.status === 503) { await new Promise(r => setTimeout(r, 10000)); continue; }
+    }).catch(() => null);
+    if (!res) continue;
+    if (res.status === 503) { await new Promise(r => setTimeout(r, 8000)); continue; }
     if (!res.ok) throw new Error(`HF ${res.status}`);
     const buf = await res.arrayBuffer();
     return uploadToTmp(buf, "image/jpeg", "ugc.jpg");
@@ -89,6 +76,7 @@ async function buildPrompt(text: string, type: string, withAvatar: boolean) {
   const sysMsg = type === "image"
     ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
     : "Write a short English cinematic video prompt (max 150 chars) for UGC. Return JSON: {prompt: string, hashtags: string[]}";
+
   if (process.env.OPENROUTER_API_KEY) {
     try { return await callOpenRouter(sysMsg, text + avatarHint); } catch { /**/ }
   }
@@ -125,32 +113,40 @@ export async function POST(req: Request) {
     });
 
     if (type === "image") {
-      generateImage(prompt).then(videoUrl =>
-        store.updateVideo(video.id, { status: "completed", videoUrl })
-      ).catch(() =>
-        store.updateVideo(video.id, { status: "failed" })
-      );
-    } else {
-      let engine = "hf";
-      let taskId: string | null = null;
-
-      // fal.ai öncelikli (en hızlı, $10 ücretsiz kredi)
-      if (FAL_KEY) {
-        taskId = await submitFalTask(prompt).catch(() => null);
-        if (taskId) engine = "fal";
-      }
-
-      // Kling AI direkt (yedek)
-      if (!taskId && process.env.KLING_API_KEY && process.env.KLING_API_SECRET) {
-        taskId = await submitKlingTask(prompt).catch(() => null);
-        if (taskId) engine = "kling";
-      }
-
-      await put(`queue/${video.id}.json`, JSON.stringify({
-        videoId: video.id, prompt, retries: 0, type, engine, taskId,
-        createdAt: new Date().toISOString(),
-      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
+      generateImage(prompt)
+        .then(videoUrl => store.updateVideo(video.id, { status: "completed", videoUrl }))
+        .catch(() => store.updateVideo(video.id, { status: "failed" }));
+      return NextResponse.json({ success: true, videoId: video.id, hashtags });
     }
+
+    // Video: try fal.ai fast model first, then quality model
+    let falRequestId: string | null = null;
+    let falModel = "";
+
+    if (FAL_KEY) {
+      falRequestId = await submitFal(prompt, FAL_FAST_MODEL);
+      if (falRequestId) {
+        falModel = FAL_FAST_MODEL;
+      } else {
+        falRequestId = await submitFal(prompt, FAL_QUALITY_MODEL);
+        if (falRequestId) falModel = FAL_QUALITY_MODEL;
+      }
+    }
+
+    if (!falRequestId) {
+      // fal.ai tamamen başarısız — hata döndür, kuyruğa koyma
+      await store.updateVideo(video.id, { status: "failed" });
+      return NextResponse.json({ error: "Video servisi şu an kullanılamıyor, lütfen tekrar deneyin." }, { status: 503 });
+    }
+
+    await put(`queue/${video.id}.json`, JSON.stringify({
+      videoId: video.id,
+      prompt,
+      retries: 0,
+      falRequestId,
+      falModel,
+      createdAt: new Date().toISOString(),
+    }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
 
     return NextResponse.json({ success: true, videoId: video.id, hashtags });
   } catch (err: any) {
