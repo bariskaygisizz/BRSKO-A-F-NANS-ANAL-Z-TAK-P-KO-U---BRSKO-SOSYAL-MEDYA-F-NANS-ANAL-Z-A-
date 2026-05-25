@@ -57,7 +57,7 @@ export async function GET(req: Request) {
 
     // Update last tried
     await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1, lastTried: new Date().toISOString() }), {
-      access: "private", addRandomSuffix: false, token: TOKEN,
+      access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN,
     });
 
     // Try HuggingFace

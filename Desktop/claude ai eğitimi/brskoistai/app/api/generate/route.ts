@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       // Videos go into the cron queue
       await put(`queue/${video.id}.json`, JSON.stringify({
         videoId: video.id, prompt, retries: 0, type, createdAt: new Date().toISOString(),
-      }), { access: "private", addRandomSuffix: false, token: TOKEN });
+      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
     }
 
     return NextResponse.json({ success: true, videoId: video.id, hashtags });
