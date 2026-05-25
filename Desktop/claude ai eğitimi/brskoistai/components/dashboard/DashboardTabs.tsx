@@ -10,7 +10,7 @@ import type { Video } from "@/lib/store";
 
 const tabs = [
   { id: "create",  label: "AI Üret",    icon: Film },
-  { id: "stock",   label: "Stok Video", icon: Library },
+  { id: "stock",   label: "Hızlı Görsel", icon: Library },
   { id: "rembg",   label: "Arka Plan Sil", icon: Scissors },
   { id: "history", label: "Geçmiş",     icon: Clock },
 ] as const;
