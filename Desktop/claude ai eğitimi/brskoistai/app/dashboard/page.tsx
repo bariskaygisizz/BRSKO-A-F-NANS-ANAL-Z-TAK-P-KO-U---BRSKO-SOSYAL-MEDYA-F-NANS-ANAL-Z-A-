@@ -6,9 +6,10 @@ export default async function Dashboard() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const [user, videos] = await Promise.all([
+  const [user, videos, limits] = await Promise.all([
     store.getUserByEmail(session.user.email!),
     store.getUserVideos(session.user.id),
+    store.getAiLimit(session.user.email!),
   ]);
 
   const firstName = user?.name?.split(" ")[0] || "Kullanıcı";
@@ -22,16 +23,12 @@ export default async function Dashboard() {
         <p className="text-zinc-400 text-sm mt-1">AI içerik üretmeye hazır mısınız?</p>
       </div>
 
-      <div className="glass rounded-2xl p-4 flex items-center gap-3 border border-purple-500/20">
-        <span className="text-xl">🎬</span>
-        <div>
-          <span className="text-sm font-medium text-purple-300">Sınırsız Ücretsiz</span>
-          <p className="text-xs text-zinc-400 mt-0.5">Video · Görsel · Arka Plan Silme</p>
-        </div>
-        <span className="ml-auto text-xs glass px-3 py-1 rounded-full text-green-400">✓ Aktif</span>
-      </div>
-
-      <DashboardTabs userId={session.user.id} videos={videos} />
+      <DashboardTabs
+        userId={session.user.id}
+        videos={videos}
+        aiUsed={limits.used}
+        aiLimit={limits.limit}
+      />
     </div>
   );
 }

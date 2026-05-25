@@ -54,7 +54,11 @@ export default function ContentGenerator({ userId }: { userId: string }) {
         body: JSON.stringify({ imageUrl: finalImageUrl || null, promotionText, type: genType, withAvatar }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Üretim başlatılamadı");
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Aylık limitiniz doldu. Stok Video sekmesini deneyin!");
+        if (data.retryable) throw new Error("Servis meşgul, 30 saniye sonra tekrar deneyin.");
+        throw new Error(data.error || "Üretim başlatılamadı");
+      }
 
       setHashtags(data.hashtags || []);
       setStatus("polling");

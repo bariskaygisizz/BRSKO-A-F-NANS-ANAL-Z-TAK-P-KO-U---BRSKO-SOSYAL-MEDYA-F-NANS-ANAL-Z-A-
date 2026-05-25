@@ -7,6 +7,8 @@ export interface User {
   password: string;
   plan: string;
   createdAt: string;
+  monthlyAiCount?: number;
+  monthlyReset?: string; // "YYYY-MM"
 }
 
 export interface Video {
@@ -24,6 +26,7 @@ export interface Video {
 }
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+const FREE_AI_LIMIT = 10; // per month
 
 function emailKey(email: string) {
   return `users/${Buffer.from(email.toLowerCase()).toString("base64url")}.json`;
@@ -35,9 +38,7 @@ async function readJson<T>(pathname: string): Promise<T | null> {
   try {
     const { blobs } = await list({ prefix: pathname, limit: 1, token: TOKEN });
     if (!blobs.length) return null;
-    const res = await fetch(blobs[0].url, {
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    });
+    const res = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${TOKEN}` } });
     if (!res.ok) return null;
     return res.json() as Promise<T>;
   } catch {
@@ -68,9 +69,35 @@ export const store = {
       password: data.password,
       plan: "free",
       createdAt: new Date().toISOString(),
+      monthlyAiCount: 0,
+      monthlyReset: new Date().toISOString().slice(0, 7),
     };
     await writeJson(emailKey(data.email), user);
     return user;
+  },
+
+  async getAiLimit(email: string): Promise<{ used: number; limit: number; remaining: number }> {
+    const user = await readJson<User>(emailKey(email));
+    if (!user) return { used: 0, limit: FREE_AI_LIMIT, remaining: FREE_AI_LIMIT };
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const used = user.monthlyReset === currentMonth ? (user.monthlyAiCount ?? 0) : 0;
+    const limit = user.plan === "free" ? FREE_AI_LIMIT : 999;
+    return { used, limit, remaining: Math.max(0, limit - used) };
+  },
+
+  async incrementAiCount(email: string): Promise<{ allowed: boolean; remaining: number }> {
+    const user = await readJson<User>(emailKey(email));
+    if (!user) return { allowed: false, remaining: 0 };
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const used = user.monthlyReset === currentMonth ? (user.monthlyAiCount ?? 0) : 0;
+    const limit = user.plan === "free" ? FREE_AI_LIMIT : 999;
+    if (used >= limit) return { allowed: false, remaining: 0 };
+    await writeJson(emailKey(email), {
+      ...user,
+      monthlyAiCount: used + 1,
+      monthlyReset: currentMonth,
+    });
+    return { allowed: true, remaining: limit - used - 1 };
   },
 
   async createVideo(data: {
