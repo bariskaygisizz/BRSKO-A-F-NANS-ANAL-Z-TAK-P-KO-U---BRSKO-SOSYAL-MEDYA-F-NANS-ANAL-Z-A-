@@ -1,9 +1,11 @@
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import { store } from "@/lib/store";
 import Groq from "groq-sdk";
 
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
+const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 async function uploadToTmp(buf: ArrayBuffer, mime: string, name: string): Promise<string> {
   const form = new FormData();
@@ -13,79 +15,39 @@ async function uploadToTmp(buf: ArrayBuffer, mime: string, name: string): Promis
   return (ud?.data?.url || "").replace(/^http:\/\/tmpfiles\.org\/(\d+)\/(.*)$/i, "https://tmpfiles.org/dl/$1/$2");
 }
 
-async function generateVideo(prompt: string): Promise<string> {
-  for (let i = 0; i < 20; i++) {
-    const res = await fetch("https://api-inference.huggingface.co/models/cerspense/zeroscope_v2_576w", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.HF_TOKEN}`,
-        "Content-Type": "application/json",
-        "x-wait-for-model": "true",
-      },
-      body: JSON.stringify({ inputs: prompt.slice(0, 200) }),
-      signal: AbortSignal.timeout(120000),
-    });
-    if (res.status === 503) {
-      const d = await res.json().catch(() => ({}));
-      await new Promise(r => setTimeout(r, Math.min((d.estimated_time || 30) * 1000, 40000)));
-      continue;
-    }
-    if (!res.ok) throw new Error(`HF video error: ${res.status}`);
-    const buf = await res.arrayBuffer();
-    return uploadToTmp(buf, "video/mp4", "ugc.mp4");
-  }
-  throw new Error("Video üretimi başarısız");
-}
-
 async function generateImage(prompt: string): Promise<string> {
   for (let i = 0; i < 10; i++) {
     const res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.HF_TOKEN}`,
-        "Content-Type": "application/json",
-        "x-wait-for-model": "true",
-      },
+      headers: { Authorization: `Bearer ${process.env.HF_TOKEN}`, "Content-Type": "application/json", "x-wait-for-model": "true" },
       body: JSON.stringify({ inputs: prompt.slice(0, 300) }),
-      signal: AbortSignal.timeout(120000),
+      signal: AbortSignal.timeout(50000),
     });
-    if (res.status === 503) {
-      const d = await res.json().catch(() => ({}));
-      await new Promise(r => setTimeout(r, Math.min((d.estimated_time || 30) * 1000, 40000)));
-      continue;
-    }
-    if (!res.ok) throw new Error(`HF image error: ${res.status}`);
+    if (res.status === 503) { await new Promise(r => setTimeout(r, 10000)); continue; }
+    if (!res.ok) throw new Error(`HF ${res.status}`);
     const buf = await res.arrayBuffer();
     return uploadToTmp(buf, "image/jpeg", "ugc.jpg");
   }
   throw new Error("Görsel üretimi başarısız");
 }
 
-async function buildPrompt(
-  promotionText: string,
-  type: "video" | "image",
-  withAvatar: boolean
-): Promise<{ prompt: string; hashtags: string[] }> {
+async function buildPrompt(text: string, type: string, withAvatar: boolean) {
   const avatarHint = withAvatar ? " Include a UGC creator person holding the product." : "";
-  const typeHint = type === "image"
-    ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
-    : "Write a short English cinematic video prompt (max 150 chars) for a product UGC video. Return JSON: {prompt: string, hashtags: string[]}";
-
   if (groq) {
     try {
+      const sysMsg = type === "image"
+        ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
+        : "Write a short English cinematic video prompt (max 150 chars) for UGC. Return JSON: {prompt: string, hashtags: string[]}";
       const res = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: typeHint },
-          { role: "user", content: promotionText + avatarHint },
-        ],
+        messages: [{ role: "system", content: sysMsg }, { role: "user", content: text + avatarHint }],
         response_format: { type: "json_object" },
         temperature: 0.8,
       });
       return JSON.parse(res.choices[0].message.content || "{}");
-    } catch { /* fall through */ }
+    } catch { /**/ }
   }
-  return { prompt: (promotionText + avatarHint).slice(0, 200), hashtags: [] };
+  return { prompt: (text + avatarHint).slice(0, 200), hashtags: [] };
 }
 
 export async function POST(req: Request) {
@@ -106,16 +68,19 @@ export async function POST(req: Request) {
       type,
     });
 
-    after(async () => {
-      try {
-        const videoUrl = type === "image"
-          ? await generateImage(prompt)
-          : await generateVideo(prompt);
-        await store.updateVideo(video.id, { status: "completed", videoUrl });
-      } catch {
-        await store.updateVideo(video.id, { status: "failed" });
-      }
-    });
+    if (type === "image") {
+      // Images are fast enough to generate inline
+      generateImage(prompt).then(videoUrl =>
+        store.updateVideo(video.id, { status: "completed", videoUrl })
+      ).catch(() =>
+        store.updateVideo(video.id, { status: "failed" })
+      );
+    } else {
+      // Videos go into the cron queue
+      await put(`queue/${video.id}.json`, JSON.stringify({
+        videoId: video.id, prompt, retries: 0, type, createdAt: new Date().toISOString(),
+      }), { access: "private", addRandomSuffix: false, token: TOKEN });
+    }
 
     return NextResponse.json({ success: true, videoId: video.id, hashtags });
   } catch (err: any) {
