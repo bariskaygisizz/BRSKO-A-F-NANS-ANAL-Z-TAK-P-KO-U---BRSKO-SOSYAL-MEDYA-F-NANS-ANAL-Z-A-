@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { store } from "@/lib/store";
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-const FAL_MODEL = "fal-ai/kling-video/v1/standard/text-to-video";
+const FAL_MODEL = "fal-ai/minimax/video-01";
 
 async function pollFalTask(requestId: string): Promise<{ videoUrl: string | null; failed: boolean }> {
   // Check status first

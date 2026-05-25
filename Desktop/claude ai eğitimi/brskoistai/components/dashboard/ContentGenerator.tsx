@@ -62,10 +62,10 @@ export default function ContentGenerator({ userId }: { userId: string }) {
       let attempts = 0;
       pollRef.current = setInterval(async () => {
         attempts++;
-        if (attempts > 80) {
+        if (attempts > 120) {
           clearInterval(pollRef.current!);
           setStatus("error");
-          setError("Zaman aşımı.");
+          setError("Zaman aşımı — lütfen tekrar deneyin.");
           return;
         }
         const s = await fetch(`/api/generate/status?videoId=${data.videoId}`);
@@ -79,7 +79,7 @@ export default function ContentGenerator({ userId }: { userId: string }) {
           setStatus("error");
           setError("Üretim başarısız oldu.");
         }
-      }, 12000);
+      }, 5000);
     } catch (err: any) {
       setStatus("error");
       setError(err.message || "Hata oluştu");
@@ -90,7 +90,7 @@ export default function ContentGenerator({ userId }: { userId: string }) {
   const statusMsg: Record<string, string> = {
     uploading: "Görsel yükleniyor...",
     generating: "AI prompt hazırlıyor...",
-    polling: genType === "video" ? "Video üretiliyor... (5-10 dk)" : "Görsel üretiliyor... (1-2 dk)",
+    polling: genType === "video" ? "Video üretiliyor... (30-90 sn)" : "Görsel üretiliyor... (1-2 dk)",
   };
 
   return (
@@ -218,7 +218,7 @@ export default function ContentGenerator({ userId }: { userId: string }) {
                 <div>
                   <p className="text-sm font-medium">AI {genType === "video" ? "video" : "görsel"} üretiyor</p>
                   <p className="text-xs text-zinc-500 mt-1">
-                    {genType === "video" ? "5-10 dakika sürebilir" : "1-3 dakika sürebilir"}
+                    {genType === "video" ? "30-90 saniye sürebilir" : "1-3 dakika sürebilir"}
                   </p>
                 </div>
               </div>

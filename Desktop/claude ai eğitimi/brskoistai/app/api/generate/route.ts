@@ -8,13 +8,13 @@ import Groq from "groq-sdk";
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const FAL_KEY = process.env.FAL_API_KEY;
-const FAL_MODEL = "fal-ai/kling-video/v1/standard/text-to-video";
+const FAL_MODEL = "fal-ai/minimax/video-01";
 
 async function submitFalTask(prompt: string): Promise<string | null> {
   const res = await fetch(`https://queue.fal.run/${FAL_MODEL}`, {
     method: "POST",
     headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: prompt.slice(0, 2500), duration: "5", aspect_ratio: "9:16" }),
+    body: JSON.stringify({ prompt: prompt.slice(0, 2000) }),
     signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) return null;
