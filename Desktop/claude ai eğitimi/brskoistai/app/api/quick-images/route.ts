@@ -1,6 +1,30 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+async function generateOne(prompt: string, hfToken: string): Promise<string | null> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch("https://api-inference.huggingface.co/models/stabilityai/sdxl-turbo", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${hfToken}`, "Content-Type": "application/json", "x-wait-for-model": "true" },
+      body: JSON.stringify({ inputs: prompt, parameters: { num_inference_steps: 4, guidance_scale: 0.0 } }),
+      signal: AbortSignal.timeout(40000),
+    }).catch(() => null);
+
+    if (!res) continue;
+    if (res.status === 503) { await new Promise(r => setTimeout(r, 5000)); continue; }
+    if (!res.ok) return null;
+
+    const buf = await res.arrayBuffer();
+    const form = new FormData();
+    form.append("file", new Blob([buf], { type: "image/jpeg" }), "img.jpg");
+    const up = await fetch("https://tmpfiles.org/api/v1/upload", { method: "POST", body: form });
+    const ud = await up.json();
+    const raw: string = ud?.data?.url || "";
+    return raw.replace(/^http:\/\/tmpfiles\.org\/(\d+)\/(.*)$/i, "https://tmpfiles.org/dl/$1/$2");
+  }
+  return null;
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -8,51 +32,21 @@ export async function POST(req: Request) {
   const { prompt } = await req.json();
   if (!prompt) return NextResponse.json({ error: "Prompt gerekli" }, { status: 400 });
 
-  const FAL_KEY = process.env.FAL_API_KEY;
-  if (!FAL_KEY) return NextResponse.json({ error: "Servis yapılandırılmamış" }, { status: 503 });
+  const HF = process.env.HF_TOKEN;
+  if (!HF) return NextResponse.json({ error: "Servis yapılandırılmamış" }, { status: 503 });
 
-  try {
-    // Submit to fal.ai FLUX schnell queue
-    const submitRes = await fetch("https://queue.fal.run/fal-ai/flux/schnell", {
-      method: "POST",
-      headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: prompt.slice(0, 500), num_images: 4, image_size: "portrait_4_3" }),
-      signal: AbortSignal.timeout(10000),
-    });
+  const fullPrompt = `professional product photography, ${prompt}, studio lighting, commercial quality, high resolution`;
 
-    if (!submitRes.ok) {
-      const err = await submitRes.text();
-      return NextResponse.json({ error: `fal.ai hata: ${err.slice(0, 100)}` }, { status: 502 });
-    }
+  // Generate 2 images in parallel (HF rate limit safe)
+  const [img1, img2] = await Promise.all([
+    generateOne(fullPrompt, HF),
+    generateOne(fullPrompt + ", different angle", HF),
+  ]);
 
-    const submitData = await submitRes.json();
-    const requestId = submitData?.request_id;
-    if (!requestId) return NextResponse.json({ error: "request_id alınamadı" }, { status: 502 });
-
-    // Poll until done (FLUX schnell is very fast ~2-5s)
-    for (let i = 0; i < 20; i++) {
-      await new Promise(r => setTimeout(r, 1000));
-      const statusRes = await fetch(`https://queue.fal.run/fal-ai/flux/schnell/requests/${requestId}/status`, {
-        headers: { Authorization: `Key ${FAL_KEY}` },
-        signal: AbortSignal.timeout(5000),
-      }).catch(() => null);
-      if (!statusRes || !statusRes.ok) continue;
-      const statusData = await statusRes.json();
-      if (statusData.status === "COMPLETED") {
-        const resultRes = await fetch(`https://queue.fal.run/fal-ai/flux/schnell/requests/${requestId}`, {
-          headers: { Authorization: `Key ${FAL_KEY}` },
-          signal: AbortSignal.timeout(5000),
-        });
-        const result = await resultRes.json();
-        const images = (result?.images || []).map((img: any) => img?.url).filter(Boolean);
-        return NextResponse.json({ images });
-      }
-      if (statusData.status === "FAILED") {
-        return NextResponse.json({ error: "Görsel üretimi başarısız" }, { status: 500 });
-      }
-    }
-    return NextResponse.json({ error: "Zaman aşımı" }, { status: 504 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  const images = [img1, img2].filter(Boolean) as string[];
+  if (images.length === 0) {
+    return NextResponse.json({ error: "Model meşgul, 30 saniye sonra tekrar deneyin." }, { status: 503 });
   }
+
+  return NextResponse.json({ images });
 }

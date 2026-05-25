@@ -6,28 +6,28 @@ import Groq from "groq-sdk";
 
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-const FAL_KEY = process.env.FAL_API_KEY;
 
-// Models tried in order — first success wins
 const FAL_VIDEO_MODELS = [
-  { id: "fal-ai/fast-animatediff", body: (p: string) => ({ prompt: p, num_frames: 16, fps: 8, num_inference_steps: 25, guidance_scale: 7.5, width: 512, height: 512 }) },
+  { id: "fal-ai/fast-animatediff", body: (p: string) => ({ prompt: p, num_frames: 16, fps: 8, num_inference_steps: 25, width: 512, height: 512 }) },
   { id: "fal-ai/minimax/video-01", body: (p: string) => ({ prompt: p }) },
-  { id: "fal-ai/mochi-v1",         body: (p: string) => ({ prompt: p, num_frames: 84, fps: 24 }) },
-  { id: "fal-ai/ltx-video",        body: (p: string) => ({ prompt: p, num_frames: 97, frame_rate: 24, width: 704, height: 480 }) },
+  { id: "fal-ai/mochi-v1",         body: (p: string) => ({ prompt: p }) },
+  { id: "fal-ai/ltx-video",        body: (p: string) => ({ prompt: p }) },
 ];
 
-async function submitFal(prompt: string): Promise<{ requestId: string; model: string } | null> {
+async function tryFal(prompt: string): Promise<{ requestId: string; model: string } | null> {
+  const FAL_KEY = process.env.FAL_API_KEY;
+  if (!FAL_KEY) return null;
   for (const m of FAL_VIDEO_MODELS) {
     try {
       const res = await fetch(`https://queue.fal.run/${m.id}`, {
         method: "POST",
         headers: { Authorization: `Key ${FAL_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify(m.body(prompt.slice(0, 500))),
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(8000),
       });
       if (!res.ok) continue;
       const data = await res.json();
-      const requestId = data?.request_id ?? data?.requestId ?? null;
+      const requestId = data?.request_id ?? null;
       if (requestId) return { requestId, model: m.id };
     } catch { /**/ }
   }
@@ -106,15 +106,13 @@ export async function POST(req: Request) {
     const { imageUrl, promotionText, type = "video", withAvatar = false } = await req.json();
     if (!promotionText) return NextResponse.json({ error: "Tanıtım metni gerekli" }, { status: 400 });
 
-    // Check monthly AI limit for video/image generation
-    if (type === "video" || type === "image") {
-      const limitCheck = await store.incrementAiCount(session.user.email);
-      if (!limitCheck.allowed) {
-        return NextResponse.json({
-          error: "Aylık AI üretim limitiniz doldu. Önümüzdeki ay tekrar kullanabilirsiniz.",
-          limitExceeded: true,
-        }, { status: 429 });
-      }
+    // Monthly limit check
+    const limitCheck = await store.incrementAiCount(session.user.email);
+    if (!limitCheck.allowed) {
+      return NextResponse.json({
+        error: "Aylık AI üretim limitiniz doldu.",
+        limitExceeded: true,
+      }, { status: 429 });
     }
 
     const { prompt, hashtags } = await buildPrompt(promotionText, type, withAvatar);
@@ -134,31 +132,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, videoId: video.id, hashtags });
     }
 
-    // Video generation via fal.ai
-    if (!FAL_KEY) {
-      await store.updateVideo(video.id, { status: "failed" });
-      return NextResponse.json({ error: "Video servisi yapılandırılmamış." }, { status: 503 });
+    // Try fal.ai first (fast), fall back to HuggingFace queue
+    const falResult = await tryFal(prompt);
+
+    if (falResult) {
+      await put(`queue/${video.id}.json`, JSON.stringify({
+        videoId: video.id, prompt, retries: 0,
+        engine: "fal",
+        falRequestId: falResult.requestId,
+        falModel: falResult.model,
+        createdAt: new Date().toISOString(),
+      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
+    } else {
+      // HuggingFace fallback — slower but always available
+      await put(`queue/${video.id}.json`, JSON.stringify({
+        videoId: video.id, prompt, retries: 0,
+        engine: "hf",
+        createdAt: new Date().toISOString(),
+      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
     }
 
-    const falResult = await submitFal(prompt);
-    if (!falResult) {
-      await store.updateVideo(video.id, { status: "failed" });
-      return NextResponse.json({
-        error: "Video servisi şu an meşgul, 1 dakika sonra tekrar deneyin.",
-        retryable: true,
-      }, { status: 503 });
-    }
-
-    await put(`queue/${video.id}.json`, JSON.stringify({
+    return NextResponse.json({
+      success: true,
       videoId: video.id,
-      prompt,
-      retries: 0,
-      falRequestId: falResult.requestId,
-      falModel: falResult.model,
-      createdAt: new Date().toISOString(),
-    }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
-
-    return NextResponse.json({ success: true, videoId: video.id, hashtags });
+      hashtags,
+      engine: falResult ? "fal" : "hf",
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Sunucu hatası" }, { status: 500 });
   }
