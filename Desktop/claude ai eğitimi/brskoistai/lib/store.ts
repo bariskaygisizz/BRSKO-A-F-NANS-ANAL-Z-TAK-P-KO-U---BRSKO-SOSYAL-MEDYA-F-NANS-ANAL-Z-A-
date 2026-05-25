@@ -1,4 +1,4 @@
-import { put, list, getDownloadUrl } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 
 export interface User {
   id: string;
@@ -35,8 +35,9 @@ async function readJson<T>(pathname: string): Promise<T | null> {
   try {
     const { blobs } = await list({ prefix: pathname, limit: 1, token: TOKEN });
     if (!blobs.length) return null;
-    const dlUrl = await getDownloadUrl(blobs[0].url, { token: TOKEN });
-    const res = await fetch(dlUrl);
+    const res = await fetch(blobs[0].url, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
     if (!res.ok) return null;
     return res.json() as Promise<T>;
   } catch {
