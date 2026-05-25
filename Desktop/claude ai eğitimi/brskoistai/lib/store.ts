@@ -1,4 +1,4 @@
-import { put, list } from "@vercel/blob";
+import { put, list, getDownloadUrl } from "@vercel/blob";
 
 export interface User {
   id: string;
@@ -18,27 +18,25 @@ export interface Video {
   videoUrl?: string | null;
   status: string;
   platform: string;
+  type: "video" | "image";
   createdAt: string;
   updatedAt: string;
 }
 
+const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+
 function emailKey(email: string) {
   return `users/${Buffer.from(email.toLowerCase()).toString("base64url")}.json`;
 }
-
-function videoKey(id: string) {
-  return `videos/${id}.json`;
-}
-
-function userVideosKey(userId: string) {
-  return `uvideos/${userId}.json`;
-}
+function videoKey(id: string) { return `videos/${id}.json`; }
+function userVideosKey(userId: string) { return `uvideos/${userId}.json`; }
 
 async function readJson<T>(pathname: string): Promise<T | null> {
   try {
-    const { blobs } = await list({ prefix: pathname, limit: 1, token: process.env.BLOB_READ_WRITE_TOKEN });
+    const { blobs } = await list({ prefix: pathname, limit: 1, token: TOKEN });
     if (!blobs.length) return null;
-    const res = await fetch(blobs[0].url);
+    const dlUrl = await getDownloadUrl(blobs[0].url, { token: TOKEN });
+    const res = await fetch(dlUrl);
     if (!res.ok) return null;
     return res.json() as Promise<T>;
   } catch {
@@ -48,10 +46,10 @@ async function readJson<T>(pathname: string): Promise<T | null> {
 
 async function writeJson<T>(pathname: string, data: T): Promise<void> {
   await put(pathname, JSON.stringify(data), {
-    access: "public",
+    access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: TOKEN,
   });
 }
 
@@ -73,7 +71,10 @@ export const store = {
     return user;
   },
 
-  async createVideo(data: { userId: string; title: string; prompt: string; imageUrl?: string | null }): Promise<Video> {
+  async createVideo(data: {
+    userId: string; title: string; prompt: string;
+    imageUrl?: string | null; type?: "video" | "image";
+  }): Promise<Video> {
     const video: Video = {
       id: crypto.randomUUID(),
       userId: data.userId,
@@ -83,11 +84,11 @@ export const store = {
       videoUrl: null,
       status: "processing",
       platform: "all",
+      type: data.type ?? "video",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     await writeJson(videoKey(video.id), video);
-    // Update user video index
     const existing = await readJson<string[]>(userVideosKey(data.userId)) ?? [];
     await writeJson(userVideosKey(data.userId), [video.id, ...existing]);
     return video;
