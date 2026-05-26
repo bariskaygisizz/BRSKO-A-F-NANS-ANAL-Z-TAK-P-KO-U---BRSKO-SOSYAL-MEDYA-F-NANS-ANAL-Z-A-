@@ -34,6 +34,24 @@ async function tryFal(prompt: string): Promise<{ requestId: string; model: strin
   return null;
 }
 
+async function callGemini(sysMsg: string, userMsg: string): Promise<any> {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: sysMsg + "\n\n" + userMsg }] }],
+        generationConfig: { responseMimeType: "application/json" },
+      }),
+      signal: AbortSignal.timeout(10000),
+    }
+  );
+  if (!res.ok) throw new Error("Gemini error");
+  const data = await res.json();
+  return JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
+}
+
 async function callOpenRouter(sysMsg: string, userMsg: string): Promise<any> {
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -79,6 +97,9 @@ async function buildPrompt(text: string, type: string, withAvatar: boolean) {
   const sysMsg = type === "image"
     ? "Write a short English product ad image prompt (max 200 chars). Return JSON: {prompt: string, hashtags: string[]}"
     : "Write a short English cinematic UGC video prompt (max 150 chars). Return JSON: {prompt: string, hashtags: string[]}";
+  if (process.env.GEMINI_API_KEY) {
+    try { return await callGemini(sysMsg, text + hint); } catch { /**/ }
+  }
   if (process.env.OPENROUTER_API_KEY) {
     try { return await callOpenRouter(sysMsg, text + hint); } catch { /**/ }
   }
