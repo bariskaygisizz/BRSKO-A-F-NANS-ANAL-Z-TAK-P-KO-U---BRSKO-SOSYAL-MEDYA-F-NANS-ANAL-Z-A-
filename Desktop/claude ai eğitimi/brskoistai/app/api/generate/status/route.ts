@@ -66,6 +66,45 @@ export async function GET(req: Request) {
       return NextResponse.json({ status: "failed", videoUrl: null });
     }
 
+    // Veo 2 path
+    if (data.engine === "veo" && data.veoOperation) {
+      const GEMINI_KEY = process.env.GEMINI_API_KEY;
+      const opRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/${data.veoOperation}?key=${GEMINI_KEY}`,
+        { signal: AbortSignal.timeout(10000) }
+      ).catch(() => null);
+
+      if (!opRes || !opRes.ok) {
+        await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1 }), {
+          access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN,
+        });
+        return NextResponse.json({ status: "processing", videoUrl: null, engine: "veo" });
+      }
+
+      const opData = await opRes.json();
+      if (opData.done) {
+        const videoUri: string | null = opData?.response?.generatedSamples?.[0]?.video?.uri ?? null;
+        if (videoUri) {
+          const vidRes = await fetch(`${videoUri}&key=${GEMINI_KEY}`, { signal: AbortSignal.timeout(30000) }).catch(() => null);
+          if (vidRes && vidRes.ok) {
+            const buf = await vidRes.arrayBuffer();
+            const videoUrl = await uploadToTmp(buf);
+            await store.updateVideo(videoId, { status: "completed", videoUrl });
+            await del(blob.url, { token: TOKEN });
+            return NextResponse.json({ status: "completed", videoUrl });
+          }
+        }
+        await store.updateVideo(videoId, { status: "failed" });
+        await del(blob.url, { token: TOKEN });
+        return NextResponse.json({ status: "failed", videoUrl: null });
+      }
+
+      await put(blob.pathname, JSON.stringify({ ...data, retries: data.retries + 1 }), {
+        access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN,
+      });
+      return NextResponse.json({ status: "processing", videoUrl: null, engine: "veo" });
+    }
+
     // fal.ai path
     if (data.engine === "fal" && data.falRequestId && data.falModel) {
       const { videoUrl, failed } = await pollFal(data.falRequestId, data.falModel);
