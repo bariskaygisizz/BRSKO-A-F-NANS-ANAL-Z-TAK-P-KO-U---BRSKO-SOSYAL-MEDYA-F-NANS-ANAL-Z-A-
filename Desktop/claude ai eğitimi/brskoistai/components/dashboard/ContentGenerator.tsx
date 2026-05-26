@@ -94,7 +94,7 @@ export default function ContentGenerator({ userId }: { userId: string }) {
   const statusMsg: Record<string, string> = {
     uploading: "Görsel yükleniyor...",
     generating: "AI prompt hazırlıyor...",
-    polling: genType === "video" ? "Video üretiliyor... (~15 sn)" : "Görsel üretiliyor... (1-2 dk)",
+    polling: genType === "video" ? "Video üretiliyor... (5-15 dk)" : "Görsel üretiliyor... (1-3 dk)",
   };
 
   return (
@@ -222,7 +222,7 @@ export default function ContentGenerator({ userId }: { userId: string }) {
                 <div>
                   <p className="text-sm font-medium">AI {genType === "video" ? "video" : "görsel"} üretiyor</p>
                   <p className="text-xs text-zinc-500 mt-1">
-                    {genType === "video" ? "~10-15 saniye" : "1-3 dakika sürebilir"}
+                    {genType === "video" ? "5-15 dakika (ücretsiz AI)" : "1-3 dakika sürebilir"}
                   </p>
                 </div>
               </div>

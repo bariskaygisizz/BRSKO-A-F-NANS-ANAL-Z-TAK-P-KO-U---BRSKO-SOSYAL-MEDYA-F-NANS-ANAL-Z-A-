@@ -135,22 +135,12 @@ export async function POST(req: Request) {
     // Try fal.ai first (fast), fall back to HuggingFace queue
     const falResult = await tryFal(prompt);
 
-    if (falResult) {
-      await put(`queue/${video.id}.json`, JSON.stringify({
-        videoId: video.id, prompt, retries: 0,
-        engine: "fal",
-        falRequestId: falResult.requestId,
-        falModel: falResult.model,
-        createdAt: new Date().toISOString(),
-      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
-    } else {
-      // HuggingFace fallback — slower but always available
-      await put(`queue/${video.id}.json`, JSON.stringify({
-        videoId: video.id, prompt, retries: 0,
-        engine: "hf",
-        createdAt: new Date().toISOString(),
-      }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
-    }
+    await put(`queue/${video.id}.json`, JSON.stringify({
+      videoId: video.id, prompt, retries: 0,
+      engine: falResult ? "fal" : "hf",
+      ...(falResult ? { falRequestId: falResult.requestId, falModel: falResult.model } : {}),
+      createdAt: new Date().toISOString(),
+    }), { access: "private", addRandomSuffix: false, allowOverwrite: true, token: TOKEN });
 
     return NextResponse.json({
       success: true,
