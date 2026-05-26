@@ -77,6 +77,32 @@ async function uploadToTmp(buf: ArrayBuffer, mime: string, name: string): Promis
 }
 
 async function generateImage(prompt: string): Promise<string> {
+  // Try Gemini Imagen 3 first
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            instances: [{ prompt: prompt.slice(0, 500) }],
+            parameters: { sampleCount: 1, aspectRatio: "3:4" },
+          }),
+          signal: AbortSignal.timeout(30000),
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+        if (b64) {
+          const buf = Buffer.from(b64, "base64");
+          return uploadToTmp(buf.buffer as ArrayBuffer, "image/jpeg", "ugc.jpg");
+        }
+      }
+    } catch { /**/ }
+  }
+  // Fallback: HuggingFace SDXL
   for (let i = 0; i < 5; i++) {
     const res = await fetch("https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0", {
       method: "POST",
@@ -86,7 +112,7 @@ async function generateImage(prompt: string): Promise<string> {
     }).catch(() => null);
     if (!res) continue;
     if (res.status === 503) { await new Promise(r => setTimeout(r, 8000)); continue; }
-    if (!res.ok) throw new Error(`HF ${res.status}`);
+    if (!res.ok) continue;
     return uploadToTmp(await res.arrayBuffer(), "image/jpeg", "ugc.jpg");
   }
   throw new Error("Görsel üretimi başarısız");
