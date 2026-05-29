@@ -3209,30 +3209,40 @@ function updateLimiterDisplay() {
     const limitInfoText = document.getElementById('limit-info-txt');
     const warningBanner = document.getElementById('early-warning-banner');
 
-    statTotals.innerText = totalScansPerformed;
+    if (statTotals) statTotals.innerText = totalScansPerformed;
 
     if (isPremiumUser) {
-        counterBadge.innerText = translations[currentLanguage].unlimitedTxt;
-        progressBar.style.width = "100%";
-        progressBar.style.background = "linear-gradient(90deg, #d946ef, #8b5cf6)";
-        statRemaining.innerText = translations[currentLanguage].unlimitedTxt;
-        limitInfoText.innerText = translations[currentLanguage].premiumBadgeTag;
+        if (counterBadge) counterBadge.innerText = translations[currentLanguage].unlimitedTxt;
+        if (progressBar) {
+            progressBar.style.width = "100%";
+            progressBar.style.background = "linear-gradient(90deg, #d946ef, #8b5cf6)";
+        }
+        if (statRemaining) statRemaining.innerText = translations[currentLanguage].unlimitedTxt;
+        if (limitInfoText) limitInfoText.innerText = translations[currentLanguage].premiumBadgeTag;
         
         // Remove paywall blurring blocks
-        document.getElementById('additives-container').classList.remove('premium-blurred-card');
-        document.getElementById('alternatives-container').classList.remove('premium-blurred-card');
-        document.getElementById('premium-badge-tag').classList.remove('hidden');
+        const additivesCont = document.getElementById('additives-container');
+        if (additivesCont) additivesCont.classList.remove('premium-blurred-card');
+        const altCont = document.getElementById('alternatives-container');
+        if (altCont) altCont.classList.remove('premium-blurred-card');
+        const premBadge = document.getElementById('premium-badge-tag');
+        if (premBadge) premBadge.classList.remove('hidden');
         if (warningBanner) warningBanner.classList.add('hidden');
     } else {
-        counterBadge.innerText = `${freeScansRemaining}/3`;
+        if (counterBadge) counterBadge.innerText = `${freeScansRemaining}/3`;
         const percentage = (freeScansRemaining / 3) * 100;
-        progressBar.style.width = `${percentage}%`;
-        statRemaining.innerText = freeScansRemaining;
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+        }
+        if (statRemaining) statRemaining.innerText = freeScansRemaining;
         
         // Restore paywall blurring blocks
-        document.getElementById('additives-container').classList.add('premium-blurred-card');
-        document.getElementById('alternatives-container').classList.add('premium-blurred-card');
-        document.getElementById('premium-badge-tag').classList.add('hidden');
+        const additivesCont = document.getElementById('additives-container');
+        if (additivesCont) additivesCont.classList.add('premium-blurred-card');
+        const altCont = document.getElementById('alternatives-container');
+        if (altCont) altCont.classList.add('premium-blurred-card');
+        const premBadge = document.getElementById('premium-badge-tag');
+        if (premBadge) premBadge.classList.add('hidden');
         
         // Early Warning Check (Amber banner appears on exactly 1 remaining free scan!)
         if (warningBanner) {
@@ -4370,11 +4380,17 @@ function compileAIEngine() {
             diet: "Diyet"
         };
         
-        document.getElementById('bp-val-profile').innerText = `${goalNames[onboardGoal]} (${dietNames[onboardDiet]})`;
+        const bpValProfile = document.getElementById('bp-val-profile');
+        if (bpValProfile) bpValProfile.innerText = `${goalNames[onboardGoal]} (${dietNames[onboardDiet]})`;
         
-        document.getElementById('well-cal-target').innerText = dailyCalTarget;
-        document.getElementById('well-cal-remaining').innerText = dailyCalTarget - dailyCalConsumed;
-        document.getElementById('well-water-target').innerText = dailyWaterTarget;
+        const wellCalTarget = document.getElementById('well-cal-target');
+        if (wellCalTarget) wellCalTarget.innerText = dailyCalTarget;
+        
+        const wellCalRemaining = document.getElementById('well-cal-remaining');
+        if (wellCalRemaining) wellCalRemaining.innerText = dailyCalTarget - dailyCalConsumed;
+        
+        const wellWaterTarget = document.getElementById('well-water-target');
+        if (wellWaterTarget) wellWaterTarget.innerText = dailyWaterTarget;
         
         triggerHaptic('success');
     }, 2500);
