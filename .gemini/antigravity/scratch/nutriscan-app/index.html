@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            var errorDiv = document.createElement('div');
+            errorDiv.style.position = 'fixed';
+            errorDiv.style.top = '0';
+            errorDiv.style.left = '0';
+            errorDiv.style.width = '100%';
+            errorDiv.style.background = 'rgba(239, 68, 68, 0.95)';
+            errorDiv.style.color = 'white';
+            errorDiv.style.padding = '15px';
+            errorDiv.style.zIndex = '9999999';
+            errorDiv.style.fontSize = '12px';
+            errorDiv.style.fontFamily = 'monospace';
+            errorDiv.style.boxSizing = 'border-box';
+            errorDiv.style.overflowWrap = 'break-word';
+            errorDiv.innerHTML = '<strong>❌ RUNTIME CRASH DETECTED:</strong><br>' + 
+                                message + '<br>in ' + source + ' at line ' + lineno + ':' + colno;
+            document.body.appendChild(errorDiv);
+            return false;
+        };
+    </script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brsko AI - Canlı Mobil Besin Analizi ve Sağlıklı Yaşam Rehberi</title>
+    <meta name="description" content="Brsko AI ile markette, manavda veya e-ticarette yiyecekleri kamerada gösterin; kalori, fayda, zarar ve katkı maddelerini anında analiz edin.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css?v=2026.05.28.13.20">
+    <!-- Supabase CDN Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Mobil Responsive Landing Page Header (Visible only on mobile) -->
+    <header class="mobile-landing-header">
+        <div class="mobile-brand">
+            <span class="logo-emoji">🥗</span>
+            <span class="logo-text">Brsko <span class="logo-accent">AI</span></span>
+        </div>
+        <button class="btn-mobile-sim-trigger" onclick="toggleMobileSimulator(true)">
+            ✨ Uygulamayı Canlı Dene
+        </button>
+    </header>
+
+    <!-- Hardware-Accelerated 3D/4D Background Constellation Simulation Canvas -->
+    <canvas id="bg-3d-canvas" class="bg-3d-canvas"></canvas>
+
+    <!-- Background Decorative Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- Main Container -->
+    <div class="main-wrapper">
+        <!-- Dashboard / Desktop Sidebar (Visible only on desktop screens) -->
+        <!-- Wide-Screen Cinematic Scrolling Showcase (Left/Main scroll body) -->
+        <div class="desktop-panel">
+            
+            <!-- Premium Brand Header with DNA logo & Language Flags -->
+            <div class="desktop-brand-header">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="assets/brsko_app_icon.png" class="desktop-brand-logo" alt="Brsko AI Logo">
+                    <div class="desktop-brand-info">
+                        <h1 class="desktop-brand-title">Brsko <span class="logo-accent">AI</span></h1>
+                    </div>
+                </div>
+                <!-- Desktop Flag Lang Selector -->
+                <div class="desktop-lang-selector">
+                    <span class="desktop-lang-lbl" id="desk-lang-lbl">🌐 Dil:</span>
+                    <div class="lang-flags-row">
+                        <button class="flag-btn flag-tr active" onclick="changeLanguage('tr')" title="Türkçe">🇹🇷</button>
+                        <button class="flag-btn flag-en" onclick="changeLanguage('en')" title="English (US)">🇺🇸</button>
+                        <button class="flag-btn flag-en" onclick="changeLanguage('en')" title="English (UK)">🇬🇧</button>
+                        <button class="flag-btn flag-es" onclick="changeLanguage('es')" title="Español">🇪🇸</button>
+                        <button class="flag-btn flag-de" onclick="changeLanguage('de')" title="Deutsch">🇩🇪</button>
+                        <button class="flag-btn flag-fr" onclick="changeLanguage('fr')" title="Français">🇫🇷</button>
+                        <button class="flag-btn flag-it" onclick="changeLanguage('it')" title="Italiano">🇮🇹</button>
+                        <button class="flag-btn flag-pt" onclick="changeLanguage('pt')" title="Português">🇧🇷</button>
+                        <button class="flag-btn flag-ru" onclick="changeLanguage('ru')" title="Русский">🇷🇺</button>
+                        <button class="flag-btn flag-zh" onclick="changeLanguage('zh')" title="简体中文">🇨🇳</button>
+                        <button class="flag-btn flag-ja" onclick="changeLanguage('ja')" title="日本語">🇯🇵</button>
+                        <button class="flag-btn flag-ko" onclick="changeLanguage('ko')" title="한국어">🇰🇷</button>
+                        <button class="flag-btn flag-hi" onclick="changeLanguage('hi')" title="हिन्दी">🇮🇳</button>
+                        <button class="flag-btn flag-ar" onclick="changeLanguage('ar')" title="العربية">🇸🇦</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cinematic Scroll Section 1: Hero (Giriş) -->
+            <section class="cinematic-section active" data-view="home" id="cine-sec-hero">
+                <div class="cine-card hero-card">
+                    <div class="brand-badge-row">
+                        <span class="cine-badge">🚀 BRSKO AI SAĞLIK DEVRİMİ</span>
+                    </div>
+                    <h2 class="cine-title">Yapay Zeka Destekli<br><span>Hücresel & Sağlık Analizi</span></h2>
+                    <p class="cine-desc">Yediğiniz her gıdayı saniyeler içinde tarayın. Katkı maddelerini, E-kodlarını, alerjen risklerini ve kişisel makro dengenizi sinematik bir siber analizle anında çözün.</p>
+                    
+                    <!-- Premium 3D Glass Showcase Banner -->
+                    <div class="desktop-promo-banner">
+                        <img src="assets/brsko_promo_banner.png" class="promo-banner-img" alt="Brsko AI Premium Showcase">
+                        <div class="banner-neon-glow"></div>
+                    </div>
+                    
+
+                    
+                    <div class="cine-scroll-prompt">
+                        <span class="scroll-arrow">↓</span> Aşağı Kaydırarak Sağlık Sinemasını İzleyin
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cinematic Scroll Section 2: Canlı Barkod & Gıda Analizi -->
+            <section class="cinematic-section" data-view="analysis" id="cine-sec-scan">
+                <div class="cine-card scanner-card">
+                    <span class="cine-badge">🔍 CANLI TARAYICI</span>
+                    <h2 class="cine-title">Yapay Zeka <span>Sağlık & Besin</span> Sohbeti</h2>
+                    <p class="cine-desc">Kişisel yapay zeka diyetisyeninizle anında mesajlaşın. Biyometrik verilerinize ve hedeflerinize özel besin önerileri, kalori analizleri ve diyet tavsiyeleri alın.</p>
+                    <div class="cine-feature-grid">
+                        <div class="cine-feature-item">
+                            <span class="feature-emoji">🟢</span>
+                            <div>
+                                <h5>E-Kodu Çözücü</h5>
+                                <p>Katkı maddelerinin sağlığa zararlı etkilerini derecelendirir.</p>
+                            </div>
+                        </div>
+                        <div class="cine-feature-item">
+                            <span class="feature-emoji">🟡</span>
+                            <div>
+                                <h5>Makro & Diyet Matrisi</h5>
+                                <p>Keto, vegan veya sporcu profilinize göre protein/yağ oranlarını doğrular.</p>
+                            </div>
+                        </div>
+                        <div class="cine-feature-item">
+                            <span class="feature-emoji">🔴</span>
+                            <div>
+                                <h5>Alerjen Sensörü</h5>
+                                <p>Laktoz, glüten veya fıstık alerjen risklerini anında algılayıp kırmızı alarm verir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cinematic Scroll Section 3: AI Biyometrik Sağlık Koçu -->
+            <section class="cinematic-section" data-view="chat" id="cine-sec-coach">
+                <div class="cine-card coach-card">
+                    <span class="cine-badge">💬 AI HEALTH COACH</span>
+                    <h2 class="cine-title">7/24 Aktif <span>Yapay Zeka Diyetisyeni</span></h2>
+                    <p class="cine-desc">Biyometrik verilerinizle (Boy, Kilo, Yaş, Diyet Hedefleri) beslenen özel koçunuzla sohbet edin. En son tarattığınız gıdayı hafızasında tutarak size özel bilimsel tavsiyeler verir.</p>
+                    <div class="cine-chat-prompt-card">
+                        <div class="prompt-pill">💡 "Bu ürün benim kas kazanma hedefime uygun mu?"</div>
+                        <div class="prompt-pill">🥗 "Akşam yemeğinde bu gıda yerine hangi temiz alternatifi tüketmeliyim?"</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cinematic Scroll Section 4: Wellness Takipçileri -->
+            <section class="cinematic-section" data-view="home-water" id="cine-sec-wellness">
+                <div class="cine-card wellness-card">
+                    <span class="cine-badge">🌊 WELLNESS HEDEFLERİ</span>
+                    <h2 class="cine-title">İnteraktif <span>Dalga Widget'ları</span></h2>
+                    <p class="cine-desc">Kişisel hedefinize göre dinamik hesaplanan günlük kalori halkası ve su dalgalanma göstergesi. Bardağa tıkladığınızda yükselen dalga animasyonlarıyla su hedefinizi yönetin.</p>
+                    <div class="water-glass-demo">
+                        <div class="water-bubble">💧 250ml cup eklemesi su dalgasını anlık yükseltir, haptik onay verir.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cinematic Scroll Section 5: Premium Abonelik Paketleri (Sadece Planlar & Doğrudan Ödeme) -->
+            <section class="cinematic-section" data-view="paywall" id="cine-sec-pricing">
+                <div class="cine-card pricing-section-card">
+                    <span class="cine-badge">🥦 TAZE ORGANİK GURME PREMIUM & MANAV</span>
+                    <h2 class="cine-title">Brsko AI <span>Abonelik Paketleri</span></h2>
+                    <p class="cine-desc">Tarama limitlerini kaldırın, AI diyetisyeninize sınırsız erişin ve hücresel sağlık devrimini yaşayın. Bir paket seçtiğinizde anında Whop güvenli ödeme sayfasına yönlendirilirsiniz.</p>
+                    
+                    <div class="desktop-pricing-grid">
+                        <!-- Starter Card -->
+                        <div class="desk-pricing-card" onclick="selectPlan('starter', 20)">
+                            <div class="tier-name">STARTER</div>
+                            <div class="price-block">$20<span>/ay</span></div>
+                            <ul class="tier-features-list">
+                                <li>✓ Günlük 10 Canlı Tarama</li>
+                                <li>✓ AI Sağlık Asistanı</li>
+                                <li>✓ Su & Kalori Takibi</li>
+                            </ul>
+                            <button class="btn-desk-checkout" onclick="selectPlan('starter', 20); event.stopPropagation();">Starter'ı Seç</button>
+                        </div>
+                        
+                        <!-- Pro Card (Recommended) -->
+                        <div class="desk-pricing-card recommended" onclick="selectPlan('pro', 50)">
+                            <span class="desk-popular-badge">Popüler</span>
+                            <div class="tier-name">PRO PLAN</div>
+                            <div class="price-block">$50<span>/ay</span></div>
+                            <ul class="tier-features-list">
+                                <li>✓ Sınırsız Hücresel Tarama</li>
+                                <li>✓ 7/24 AI Diyetisyen (Limitsiz)</li>
+                                <li>✓ Akıllı Alternatif Önerileri</li>
+                                <li>✓ Alerjen & E-Kodu Sensörü</li>
+                            </ul>
+                            <button class="btn-desk-checkout" onclick="selectPlan('pro', 50); event.stopPropagation();">Pro'ya Yüksel</button>
+                        </div>
+                        
+                        <!-- Elite Card -->
+                        <div class="desk-pricing-card" onclick="selectPlan('elite', 100)">
+                            <div class="tier-name">ELITE</div>
+                            <div class="price-block">$100<span>/ay</span></div>
+                            <ul class="tier-features-list">
+                                <li>✓ Sınırsız Canlı Tarama + VIP</li>
+                                <li>✓ Birebir AI Kalibrasyon</li>
+                                <li>✓ VIP WhatsApp Topluluğu</li>
+                                <li>✓ Kurucu Özel Desteği</li>
+                            </ul>
+                            <button class="btn-desk-checkout" onclick="selectPlan('elite', 100); event.stopPropagation();">Elite'e Katıl</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pricing-safety-note">
+                        🔒 Güvenli Altyapı: Ödemeleriniz Whop güvencesiyle uçtan uca şifrelenir.
+                    </div>
+                </div>
+            </section>
+            
+            <div class="desktop-footer">
+                &copy; 2026 Brsko AI. Tüm hakları saklıdır. Designed for Premium Mobile & Web Experience.
+            </div>
+        </div>
+
+        <!-- Mobile Phone Simulator Container -->
+        <div class="phone-simulator" id="mobile-phone-simulator">
+            <!-- Fullscreen desktop trigger button -->
+            <button class="btn-simulator-fullscreen" id="btn-simulator-fullscreen" onclick="try { const w = window.open(window.location.origin + window.location.pathname + '?app=true', '_blank'); if (!w) window.location.href = window.location.origin + window.location.pathname + '?app=true'; } catch(e) { window.location.href = window.location.origin + window.location.pathname + '?app=true'; }" title="Brsko AI'ı Yeni Sekmede Aç">
+                <span>📱 Yeni Sekmede Aç</span>
+            </button>
+            
+            <div class="iphone-15-pro">
+                <!-- Mobile Fullscreen Close Bar (Visible only in fullscreen simulation mode) -->
+                <div class="simulator-close-bar" onclick="toggleFullscreenSimulator(false)">
+                    <span>✕ Brsko AI'ı Küçült (Geri Dön)</span>
+                </div>
+                
+                <!-- Phone Inner Screen -->
+                <div class="phone-screen" id="app-screen">
+                    
+                    <!-- App Startup Splash Overlay (3 Seconds Cyber Intro) -->
+                    <div id="app-startup-splash" class="app-startup-splash-overlay">
+                        <div class="startup-splash-content">
+                            <!-- 3D Neural/Molecular Canvas -->
+                            <canvas id="startup-3d-canvas" class="startup-3d-canvas"></canvas>
+                            
+                            <!-- Cyber HUD Brackets -->
+                            <div class="cyber-bracket-top-left"></div>
+                            <div class="cyber-bracket-top-right"></div>
+                            <div class="cyber-bracket-bottom-left"></div>
+                            <div class="cyber-bracket-bottom-right"></div>
+                            
+                            <!-- Top Status Tickers -->
+                            <div class="startup-hud-header">
+                                <span class="hud-ticker">SECURE BOOT // BRSKO-CORE_V3.9</span>
+                                <span class="hud-latency">SYS_TEMP: 34°C</span>
+                            </div>
+                            
+                            <!-- Central Glowing Hologram -->
+                            <div class="startup-logo-container">
+                                <div class="startup-logo-glow">⚡</div>
+                                <h1 class="startup-logo-title">BRSKO <span class="accent-neon">AI</span></h1>
+                                <p class="startup-logo-slogan">YAPAY ZEKA SİBER BESİN ANALİZ UYGULAMASI</p>
+                            </div>
+                            
+                            <!-- Diagnostic Cyber Log Feed -->
+                            <div class="startup-log-feed" id="startup-log-feed">
+                                <div>[OK] CORE SYSTEM INITIALIZED...</div>
+                                <div>[OK] NEURAL NETWORKS ACTIVE...</div>
+                                <div>[OK] SIBER DATA CHANNELS SYNCD...</div>
+                            </div>
+                            
+                            <!-- Bottom Progress and Countdown -->
+                            <div class="startup-footer-bar">
+                                <div class="startup-loader-container">
+                                    <div class="startup-loader-fill" id="startup-loader-fill"></div>
+                                </div>
+                                <div class="startup-timer-status">
+                                    <span class="status-blink"></span> TARAYICI HAZIRLANIYOR... <span id="startup-countdown-sec">2</span>s
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- iOS Status Bar / Dynamic Island -->
+                    <div class="phone-header">
+                        <div class="time" id="phone-clock">23:31</div>
+                        <div class="dynamic-island">
+                            <div class="island-camera"></div>
+                        </div>
+                        <div class="status-icons">
+                            <span class="icon-wifi">📶</span>
+                            <span class="icon-battery">🔋</span>
+                        </div>
+                    </div>
+
+                    <!-- App Header -->
+                    <header class="app-navbar">
+                        <div class="navbar-left" onclick="switchView('home')">
+                            <img src="assets/brsko_app_icon.png" class="app-navbar-logo" alt="Brsko AI Logo">
+                            <span class="logo-text">Brsko <span class="logo-accent">AI</span></span>
+                        </div>
+                        <div class="navbar-right">
+                            <button class="nav-profile-btn" onclick="switchView('profile')" id="nav-profile-txt">👤 Profil</button>
+                        </div>
+                    </header>
+
+                    <!-- Mobile App Flag Lang Selector -->
+                    <div class="app-lang-header">
+                        <span class="lang-label" id="app-lang-lbl">🌐 Dil:</span>
+                        <div class="lang-flags-row">
+                            <button class="flag-btn flag-tr active" onclick="changeLanguage('tr')" title="Türkçe">🇹🇷</button>
+                            <button class="flag-btn flag-en" onclick="changeLanguage('en')" title="English (US)">🇺🇸</button>
+                            <button class="flag-btn flag-en" onclick="changeLanguage('en')" title="English (UK)">🇬🇧</button>
+                            <button class="flag-btn flag-es" onclick="changeLanguage('es')" title="Español">🇪🇸</button>
+                            <button class="flag-btn flag-de" onclick="changeLanguage('de')" title="Deutsch">🇩🇪</button>
+                            <button class="flag-btn flag-fr" onclick="changeLanguage('fr')" title="Français">🇫🇷</button>
+                            <button class="flag-btn flag-it" onclick="changeLanguage('it')" title="Italiano">🇮🇹</button>
+                            <button class="flag-btn flag-pt" onclick="changeLanguage('pt')" title="Português">🇧🇷</button>
+                            <button class="flag-btn flag-ru" onclick="changeLanguage('ru')" title="Русский">🇷🇺</button>
+                            <button class="flag-btn flag-zh" onclick="changeLanguage('zh')" title="简体中文">🇨🇳</button>
+                            <button class="flag-btn flag-ja" onclick="changeLanguage('ja')" title="日本語">🇯🇵</button>
+                            <button class="flag-btn flag-ko" onclick="changeLanguage('ko')" title="한국어">🇰🇷</button>
+                            <button class="flag-btn flag-hi" onclick="changeLanguage('hi')" title="हिन्दी">🇮🇳</button>
+                            <button class="flag-btn flag-ar" onclick="changeLanguage('ar')" title="العربية">🇸🇦</button>
+                        </div>
+                    </div>
+
+                    <!-- View Container -->
+                    <main class="app-content">
+
+                        <!-- 0. TESLA-STYLE ONBOARDING VIEW -->
+                        <div id="view-onboarding" class="app-view">
+                            <div class="onboarding-container">
+                                <!-- Step 1: Welcome -->
+                                <div class="onboarding-step active" id="onboard-step-1">
+                                    <div class="onboard-cyber-splash-container">
+                                         <!-- Real-time 3D Holographic Canvas of fruits and software neurons -->
+                                         <canvas id="onboard-3d-canvas" class="onboard-3d-canvas"></canvas>
+                                         
+                                         <!-- Cyber Bracket HUD Overlays -->
+                                         <div class="cyber-bracket-top-left"></div>
+                                         <div class="cyber-bracket-bottom-right"></div>
+                                         
+                                         <!-- Siber HUD Telemetry Data Feed -->
+                                         <div class="onboard-hud-data-left">
+                                             <div class="hud-line">SYS.STATUS: ONLINE</div>
+                                             <div class="hud-line">MODEL: BRSKO_V3.8</div>
+                                             <div class="hud-line">DATA_SYNC: 99.8%</div>
+                                         </div>
+                                         <div class="onboard-hud-data-right">
+                                             <div class="hud-line">TRACK: ACTIVE</div>
+                                             <div class="hud-line">GENE_MAP: SYNC</div>
+                                             <div class="hud-line">CYBER_SCAN: OK</div>
+                                         </div>
+                                         
+                                         <!-- Scrolling Siber Log Stream -->
+                                         <div class="onboard-hud-log-stream" id="onboard-hud-log-stream">
+                                             <div>PROBING MOLECULES...</div>
+                                             <div>VEGETABLE GENOMICS DETECTED...</div>
+                                             <div>AI ALGORITHM CALIBRATED...</div>
+                                         </div>
+                                     </div>
+                                    <h2 class="onboard-title">Brsko <span class="onboard-title-accent">AI</span></h2>
+                                    <p class="onboard-desc" id="onboard-w-desc">Yapay Zeka Destekli Sağlık ve Beslenme Devrimi</p>
+
+                                    <button class="btn-onboard-next" onclick="nextOnboardStep(2)" id="onboard-w-btn">Hadi Başlayalım</button>
+                                </div>
+
+                                <!-- Step 2: Biometrics -->
+                                <div class="onboarding-step" id="onboard-step-2">
+                                    <h3 class="onboard-step-title" id="onboard-b-title">Biyometrik Bilgileriniz</h3>
+                                    <p class="onboard-step-desc" id="onboard-b-desc">AI asistanınızın sizi tanıması için boy, kilo ve yaş bilgilerinizi girin.</p>
+                                    
+                                    <div class="onboard-form">
+                                        <div class="onboard-input-group">
+                                            <label id="onboard-lbl-height">Boy (cm)</label>
+                                            <div class="range-slider-wrapper">
+                                                <input type="range" id="onboard-height-range" min="100" max="220" value="175" oninput="updateOnboardHeightVal(this.value)">
+                                                <span class="range-value" id="onboard-height-val">175 cm</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="onboard-input-group">
+                                            <label id="onboard-lbl-weight">Kilo (kg)</label>
+                                            <div class="range-slider-wrapper">
+                                                <input type="range" id="onboard-weight-range" min="30" max="150" value="70" oninput="updateOnboardWeightVal(this.value)">
+                                                <span class="range-value" id="onboard-weight-val">70 kg</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="onboard-input-group">
+                                            <label id="onboard-lbl-age">Yaş</label>
+                                            <div class="range-slider-wrapper">
+                                                <input type="range" id="onboard-age-range" min="10" max="100" value="26" oninput="updateOnboardAgeVal(this.value)">
+                                                <span class="range-value" id="onboard-age-val">26</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="onboard-input-group">
+                                            <label id="onboard-lbl-gender">Cinsiyet</label>
+                                            <div class="gender-selector">
+                                                <button class="gender-btn active" id="gender-male" onclick="setOnboardGender('male')">Erkek</button>
+                                                <button class="gender-btn" id="gender-female" onclick="setOnboardGender('female')">Kadın</button>
+                                                <button class="gender-btn" id="gender-other" onclick="setOnboardGender('other')">Diğer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="onboard-nav-buttons">
+                                        <button class="btn-onboard-back" onclick="nextOnboardStep(1)" id="onboard-b-btn-back">Geri</button>
+                                        <button class="btn-onboard-next" onclick="nextOnboardStep(3)" id="onboard-b-btn-next">İleri</button>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Goals -->
+                                <div class="onboarding-step" id="onboard-step-3">
+                                    <h3 class="onboard-step-title" id="onboard-g-title">Ana Hedefiniz Nedir?</h3>
+                                    <p class="onboard-step-desc" id="onboard-g-desc">AI'ın analizlerini hedefinize göre kişiselleştireceğiz.</p>
+                                    
+                                    <div class="onboard-options-grid">
+                                        <div class="onboard-option-card active" id="goal-loss" onclick="setOnboardGoal('loss')">
+                                            <span class="card-icon">📉</span>
+                                            <h4 id="goal-loss-txt">Kilo Verme</h4>
+                                            <p id="goal-loss-desc">Sağlıklı şekilde kalori açığı yaratarak kilo verin.</p>
+                                        </div>
+                                        <div class="onboard-option-card" id="goal-gain" onclick="setOnboardGoal('gain')">
+                                            <span class="card-icon">📈</span>
+                                            <h4 id="goal-gain-txt">Kas Hacmi Kazanma</h4>
+                                            <p id="goal-gain-desc">Yüksek proteinli beslenerek kas kütlenizi artırın.</p>
+                                        </div>
+                                        <div class="onboard-option-card" id="goal-healthy" onclick="setOnboardGoal('healthy')">
+                                            <span class="card-icon">🥗</span>
+                                            <h4 id="goal-healthy-txt">Sağlıklı Yaşam</h4>
+                                            <p id="goal-healthy-desc">Temiz içerikli besinlerle vücut zindeliğinizi koruyun.</p>
+                                        </div>
+                                        <div class="onboard-option-card" id="goal-diet" onclick="setOnboardGoal('diet')">
+                                            <span class="card-icon">🎯</span>
+                                            <h4 id="goal-diet-txt">Özel Diyet</h4>
+                                            <p id="goal-diet-desc">Keto, fitness veya vegan alışkanlıklarınıza sadık kalın.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="onboard-nav-buttons">
+                                        <button class="btn-onboard-back" onclick="nextOnboardStep(2)" id="onboard-g-btn-back">Geri</button>
+                                        <button class="btn-onboard-next" onclick="nextOnboardStep(4)" id="onboard-g-btn-next">İleri</button>
+                                    </div>
+                                </div>
+
+                                <!-- Step 4: Dietary & Allergies -->
+                                <div class="onboarding-step" id="onboard-step-4">
+                                    <h3 class="onboard-step-title" id="onboard-d-title">Diyet ve Alerjen Tercihleri</h3>
+                                    <p class="onboard-step-desc" id="onboard-d-desc">Hassasiyetleriniz bizim için çok önemli.</p>
+                                    
+                                    <div class="onboard-scroll-section">
+                                        <h4 class="onboard-sub-lbl" id="onboard-lbl-dietmodel">Diyet Modeli</h4>
+                                        <div class="diet-model-selector">
+                                            <button class="diet-btn active" id="diet-std" onclick="setOnboardDiet('std')">Standart</button>
+                                            <button class="diet-btn" id="diet-vegan" onclick="setOnboardDiet('vegan')">Vegan</button>
+                                            <button class="diet-btn" id="diet-vege" onclick="setOnboardDiet('vege')">Vejetaryen</button>
+                                            <button class="diet-btn" id="diet-keto" onclick="setOnboardDiet('keto')">Keto</button>
+                                            <button class="diet-btn" id="diet-fitness" onclick="setOnboardDiet('fitness')">Fitness</button>
+                                        </div>
+                                        
+                                        <h4 class="onboard-sub-lbl" id="onboard-lbl-allergies">Alerjen Uyarısı</h4>
+                                        <div class="allergen-selection-list">
+                                            <label class="allergen-checkbox-card" id="all-peanut-card">
+                                                <input type="checkbox" id="all-peanut" onchange="toggleOnboardAllergy('peanut')">
+                                                <span class="chk-lbl">🥜 Fıstık / Kuruyemiş</span>
+                                            </label>
+                                            <label class="allergen-checkbox-card" id="all-gluten-card">
+                                                <input type="checkbox" id="all-gluten" onchange="toggleOnboardAllergy('gluten')">
+                                                <span class="chk-lbl">🍞 Glüten Hassasiyeti</span>
+                                            </label>
+                                            <label class="allergen-checkbox-card" id="all-lactose-card">
+                                                <input type="checkbox" id="all-lactose" onchange="toggleOnboardAllergy('lactose')">
+                                                <span class="chk-lbl">🥛 Laktoz / Süt Alerjisi</span>
+                                            </label>
+                                            <label class="allergen-checkbox-card" id="all-seafood-card">
+                                                <input type="checkbox" id="all-seafood" onchange="toggleOnboardAllergy('seafood')">
+                                                <span class="chk-lbl">🦀 Deniz Ürünleri</span>
+                                            </label>
+                                            <label class="allergen-checkbox-card" id="all-soy-card">
+                                                <input type="checkbox" id="all-soy" onchange="toggleOnboardAllergy('soy')">
+                                                <span class="chk-lbl">🌱 Soya Ürünleri</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="onboard-nav-buttons">
+                                        <button class="btn-onboard-back" onclick="nextOnboardStep(3)" id="onboard-d-btn-back">Geri</button>
+                                        <button class="btn-onboard-next" onclick="compileAIEngine()" id="onboard-d-btn-next">Profili Oluştur</button>
+                                    </div>
+                                </div>
+
+                                <!-- Step 5: Compilation and Premium Promotion -->
+                                <div class="onboarding-step" id="onboard-step-5">
+                                    <div class="ai-compiler-screen" id="ai-compiler-loader">
+                                        <div class="orb-pulser"></div>
+                                        <span class="brain-icon">🧠</span>
+                                        <h3 id="onboard-ai-compiling">AI Sağlık Planınız Derleniyor...</h3>
+                                        <p class="compiler-sub" id="onboard-ai-compiling-sub">Biyometrik verileriniz işleniyor, en uygun beslenme parametreleri belirleniyor.</p>
+                                    </div>
+                                    
+                                    <div class="ai-compiler-result hidden" id="ai-compiler-success">
+                                        <div class="success-ring-glow">✨</div>
+                                        <h3 id="onboard-ai-success-title">Özel AI Planınız Hazır!</h3>
+                                        <p class="onboard-step-desc" id="onboard-ai-success-desc">AI sizin için günlük ideal hedefleri belirledi:</p>
+                                        
+                                        <!-- Custom Blueprint summary -->
+                                        <div class="blueprint-summary-card">
+                                            <div class="bp-row">
+                                                <span id="bp-lbl-target">Günlük Kalori Hedefi:</span>
+                                                <strong id="bp-val-target">2250 Kcal</strong>
+                                            </div>
+                                            <div class="bp-row">
+                                                <span id="bp-lbl-water">Günlük Su Hedefi:</span>
+                                                <strong id="bp-val-water">3000 ml</strong>
+                                            </div>
+                                            <div class="bp-row">
+                                                <span id="bp-lbl-profile">Profil Tipi:</span>
+                                                <strong id="bp-val-profile">Standart</strong>
+                                            </div>
+                                        </div>
+
+                                        <!-- Optional Siber Signup block -->
+                                        <div class="bp-signup-block">
+                                            <p style="font-size: 11px; color: var(--color-primary); font-weight: 600; margin-bottom: 8px; text-align: center;" id="bp-signup-pitch">🛡️ Profilinizi Kaydedin ve Buluta Eşleyin</p>
+                                            <input type="text" id="onboard-username" class="onboard-siber-input" placeholder="Kullanıcı Adı Seçin..." style="margin-bottom: 6px;">
+                                            <input type="password" id="onboard-password" class="onboard-siber-input" placeholder="Güçlü Bir Şifre Girin...">
+                                            <div class="auth-error-msg hidden" id="onboard-auth-error" style="font-size: 10px; margin-top: 4px; text-align: center;">❌ Bu kullanıcı adı zaten alınmış!</div>
+                                        </div>
+
+                                        <p class="paywall-onboard-pitch" id="onboard-pitch-txt">Analizlerde sınırları kaldırmak ve E-Kod uyarısını açmak ister misiniz?</p>
+                                        <div class="onboard-paywall-teaser" onclick="triggerPaywall('onboarding')">
+                                            <span>💎 BRSKO PRO'yu Keşfet</span>
+                                            <strong>$50/ay</strong>
+                                        </div>
+
+                                        <button class="btn-onboard-next" onclick="completeOnboarding()" id="onboard-btn-enter">Uygulamaya Giriş Yap</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 1. HOME VIEW (ANA EKRAN) -->
+                        <div id="view-home" class="app-view active">
+
+                            <!-- Neon Glowing BRSKO AI Brand Logo -->
+                            <div class="neon-divider-logo">BRSKO AI</div>
+
+                            <!-- 🤖 BRSKO AI CHAT WIDGET -->
+                            <div class="card search-card brsko-chat-card">
+                                <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 8px;">
+                                    <span class="status-blink"></span>
+                                    <h3 class="section-title" id="search-title" style="margin: 0; font-size: 13px; color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🤖 Brsko AI Chat</h3>
+                                </div>
+                                
+                                <!-- Dynamic Chat Messages Box -->
+                                <div class="home-chat-messages" id="home-chat-messages-box">
+                                    <div class="chat-msg message-ai">
+                                        <strong>Brsko AI:</strong> Merhaba! Ben senin kişisel yapay zeka sağlık ve besin asistanınım. Biyometrik verilerine göre sana özel öneriler verebilirim. Herhangi bir gıdayı, kaloriyi veya diyet tavsiyesini sorabilirsin! ⚡
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Chat Chips (Öneri Sorular) -->
+                                <div class="chat-chips-row" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none;">
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🥑 Avokado faydalı mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🥑 Avokado?</button>
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🍬 Şeker kilo aldırır mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🍬 Şeker?</button>
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🏋️ Kaç gr protein almalıyım?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🏋️ Protein?</button>
+                                </div>
+                                
+                                <!-- Chat Input Box -->
+                                <div class="search-box">
+                                    <input type="text" id="home-chat-input-field" placeholder="Fıstık ezmesi kilo aldırır mı?..." onkeypress="handleHomeChatKeyPress(event)">
+                                    <button class="search-btn" onclick="sendHomeUserChatMessage()" id="btn-search-txt" style="background: linear-gradient(135deg, var(--color-primary), #059669) !important; color: white !important; border-radius: 8px;">Sor</button>
+                                </div>
+                            </div>
+
+                            <!-- Scanning Limit Progress Bar -->
+                            <div class="scan-limit-card" style="display: none;">
+                                <div class="limit-header">
+                                    <span id="limit-title">Ücretsiz Deneme Taramaları</span>
+                                    <span class="limit-badge" id="limit-counter">3/3</span>
+                                </div>
+                                <div class="limit-progress-bg">
+                                    <div class="limit-progress-bar" id="limit-progress" style="width: 100%;"></div>
+                                </div>
+                                <p class="limit-info" id="limit-info-txt">Sınırsız analiz için Premium'a yükseltin.</p>
+                            </div>
+
+                            <!-- 📷 LAUNCH LIVE CAMERA ACTION CARD -->
+                            <div class="card wellness-card camera-launcher-card" style="margin-top: 15px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 20, 25, 0.8) 100%); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.06); text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center;">
+                                <span style="font-size: 32px; animation: pulse 1.5s infinite;">📷</span>
+                                <h4 style="color: var(--color-primary); font-size: 14.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">SİBER ANALİZ KAMERASI</h4>
+                                <p style="font-size: 11px; color: var(--color-text-sub); margin: 0; line-height: 1.4;">
+                                    Kameranızı açın ve gıdaları siber tarayıcı ile anında analiz edin! Faydalarını, zararlarını ve hücresel kalori değerlerini anında keşfedin.
+                                </p>
+                                <button class="btn-activate-cam-launcher siber-btn-accent" onclick="initCamera(); document.getElementById('camera-viewport').scrollIntoView({ behavior: 'smooth' });" style="width: 100%; height: 42px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), #10b981); color: #050508; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35); transition: all 0.3s ease;">
+                                    📷 CANLI SİBER KAMERAYI AÇ 🚀
+                                </button>
+                            </div>
+
+                            <!-- Dynamic Early Warning Banner (Amber glowing, rich emojis) -->
+                            <div id="early-warning-banner" class="early-warning-banner hidden">
+                                <div class="warning-content">
+                                    <span class="warning-icon">⚠️🚨</span>
+                                    <span id="early-warning-txt">Son 1 Ücretsiz Analiz Hakkınız Kaldı! Kesintisiz siber tarama ve limitsiz AI koçluğu için şimdi Premium'a geçin! ⚡💎</span>
+                                </div>
+                                <button class="btn-warning-action" onclick="switchView('paywall')">Premium Yükselt 👑</button>
+                            </div>
+
+                            <!-- Daily Wellness Trackers Dashboard -->
+                            <div class="wellness-trackers-dashboard">
+                                <!-- Calorie Tracker Widget -->
+                                <div class="card wellness-card calorie-tracker-widget">
+                                    <h4 class="widget-title" id="well-calorie-title">🔥 Günlük Kalori Takipçisi</h4>
+                                    <div class="calorie-widget-content">
+                                        <div class="cal-gauge-wrapper">
+                                            <svg viewBox="0 0 100 100" class="cal-gauge-svg">
+                                                <circle cx="50" cy="50" r="40" class="cal-gauge-bg"></circle>
+                                                <circle cx="50" cy="50" r="40" class="cal-gauge-fill" id="cal-gauge-fill-ring" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                                            </svg>
+                                            <div class="cal-gauge-text">
+                                                <span class="cal-value" id="well-cal-consumed">0</span>
+                                                <span class="cal-slash">/</span>
+                                                <span class="cal-target" id="well-cal-target">2250</span>
+                                                <span class="cal-unit">kcal</span>
+                                            </div>
+                                        </div>
+                                        <div class="cal-stats">
+                                            <div class="cal-stat-col">
+                                                <span class="cal-stat-lbl" id="well-cal-lbl-rem">Kalan</span>
+                                                <span class="cal-stat-val text-green" id="well-cal-remaining">2250</span>
+                                            </div>
+                                            <button class="btn-add-calorie" onclick="openAddCalorieModal()" id="well-btn-add-cal">+ Yemek Ekle</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Water Cup Logger Widget -->
+                                <div class="card wellness-card water-tracker-widget">
+                                    <h4 class="widget-title" id="well-water-title">💧 Su İçme Takibi</h4>
+                                    <div class="water-widget-content">
+                                        <!-- Interactive Glassmorphic Wave Water Cup -->
+                                        <div class="water-cup-container" onclick="logWaterCup()">
+                                            <div class="water-glass">
+                                                <!-- Wavy dynamic water fill -->
+                                                <div class="water-fill" id="water-fill-wave" style="height: 0%;">
+                                                    <div class="water-wave wave-front"></div>
+                                                    <div class="water-wave wave-back"></div>
+                                                </div>
+                                            </div>
+                                            <span class="water-cup-plus">+</span>
+                                        </div>
+                                        <div class="water-stats">
+                                            <div class="water-stat-row">
+                                                <span class="water-val" id="well-water-logged">0</span>
+                                                <span class="water-slash">/</span>
+                                                <span class="water-target" id="well-water-target">3000</span>
+                                                <span class="water-unit">ml</span>
+                                            </div>
+                                            <button class="btn-add-water" onclick="logWaterCup()" id="well-btn-add-water">+ 250ml Su Ekle</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Camera Scanner Simulator -->
+                            <div class="scanner-container">
+                                <!-- Real Webcam Video or Dynamic Interactive Placeholder -->
+                                <div class="camera-viewport" id="camera-viewport">
+                                    <video id="webcam-stream" autoplay playsinline muted class="hidden"></video>
+                                    <button class="btn-scan-capture hidden" id="btn-scan-capture" onclick="captureAndAnalyze()">🎯 Besini Analiz Et</button>
+                                    <div class="camera-fallback" id="camera-fallback-screen">
+                                        <div class="fallback-glow"></div>
+                                        <span class="scanner-radar"></span>
+                                        <span class="camera-icon">📷</span>
+                                        <p id="cam-fallback-txt">Kamera izni bekleniyor veya simülasyon aktif...</p>
+                                    </div>
+                                    
+                                    <!-- Scan Laser Line Effect -->
+                                    <div class="laser-scanner" id="laser-line"></div>
+                                    
+                                    <!-- Dynamic Scanning Target Overlay -->
+                                    <div class="scanner-corners">
+                                        <div class="corner tl"></div>
+                                        <div class="corner tr"></div>
+                                        <div class="corner bl"></div>
+                                        <div class="corner br"></div>
+                                    </div>
+
+                                    <!-- Futuristic Cyber Scan Overlay Grid and HUD Lock-on Telemetry -->
+                                    <div class="cyber-scan-overlay hidden" id="cyber-scan-overlay">
+                                        <!-- Real-time 3D Simulated Metaverse Hologram Scanning Canvas -->
+                                        <canvas id="metaverse-scan-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.85;"></canvas>
+                                        <div class="cyber-scan-grid" style="z-index: 1;"></div>
+                                        <div class="cyber-hud-top" style="z-index: 2;">
+                                            <span class="hud-glitch-text">SYS STATUS: SCANNING BIOMASS...</span>
+                                            <span class="hud-coords" id="hud-live-coords">LOCK COORDS: X:42.1 Y:19.8</span>
+                                        </div>
+                                        <div class="cyber-target-bracket-box">
+                                            <div class="target-bracket-corner tl"></div>
+                                            <div class="target-bracket-corner tr"></div>
+                                            <div class="target-bracket-corner bl"></div>
+                                            <div class="target-bracket-corner br"></div>
+                                            <div class="target-radar-sweep"></div>
+                                            <span class="target-lock-label" id="cyber-target-label">ANALYZING MOLECULES...</span>
+                                        </div>
+                                        <div class="cyber-hud-bottom">
+                                            <div class="hud-metric-row">
+                                                <span class="hud-metric-lbl">HOLOGRAPHIC PROBE:</span>
+                                                <span class="hud-metric-val active-pulse">ONLINE</span>
+                                            </div>
+                                            <div class="hud-metric-row">
+                                                <span class="hud-metric-lbl">E-NUMBER SEARCH:</span>
+                                                <span class="hud-metric-val">SYNCED</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Scanning Info overlay -->
+                                    <div class="scanning-status-overlay hidden" id="scan-loading-overlay">
+                                        <div class="spinner"></div>
+                                        <span id="scanning-label">Yapay Zeka Analiz Ediyor...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Image/Video Area -->
+                            <div class="upload-card">
+                                <h3 class="section-title" id="upload-title">📤 Fotoğraf veya Video Analizi</h3>
+                                <div class="upload-dropzone" id="dropzone" onclick="triggerFileInput()">
+                                    <div class="drop-icon">📁</div>
+                                    <p class="drop-text" id="drop-text-txt">Görsel / Video yükleyin veya sürükleyin</p>
+                                    <input type="file" id="file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelect(event)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. ANALYSIS VIEW (ANALİZ EKRANI) -->
+                        <div id="view-analysis" class="app-view">
+                            <div class="view-header">
+                                <button class="back-btn" onclick="switchView('home')" id="back-btn-txt">⬅️ Geri Dön</button>
+                                <span class="badge premium-only-badge hidden" id="premium-badge-tag">💎 Premium</span>
+                            </div>
+
+                            <!-- Analyzed Product Card -->
+                            <div class="product-summary-card">
+                                <div class="prod-img-placeholder" id="prod-visual">🍉</div>
+                                <div class="prod-info">
+                                    <h2 id="prod-name">Avokado</h2>
+                                    <p class="prod-category" id="prod-category">Taze Meyve / Doğal Besin</p>
+                                </div>
+                            </div>
+
+                            <!-- Health Score Circular Card -->
+                            <div class="card health-score-card">
+                                <div class="health-card-header">
+                                    <h3 id="health-score-title">Sağlık Skoru</h3>
+                                    <span class="score-label" id="score-grade">Mükemmel</span>
+                                </div>
+                                <div class="health-gauge-wrapper">
+                                    <div class="health-gauge">
+                                        <svg viewBox="0 0 100 100" class="gauge-svg">
+                                            <circle cx="50" cy="50" r="40" class="gauge-bg"></circle>
+                                            <circle cx="50" cy="50" r="40" class="gauge-fill" id="gauge-fill-ring" stroke-dasharray="251.2" stroke-dashoffset="50.2"></circle>
+                                        </svg>
+                                        <div class="gauge-text">
+                                            <span class="score-value" id="score-num">80</span>
+                                            <span class="score-total">/100</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Calories & Macros -->
+                            <div class="card macros-card">
+                                <div class="macro-calories">
+                                    <div class="cal-val" id="macro-calories-val">160</div>
+                                    <div class="cal-lbl" id="macro-calories-lbl">Kcal (100g)</div>
+                                </div>
+                                <hr class="divider">
+                                <div class="macros-grid">
+                                    <div class="macro-col">
+                                        <div class="macro-label" id="macro-p-txt">Protein</div>
+                                        <div class="macro-bar p-bar"><div class="macro-progress" id="macro-p-progress" style="width: 10%;"></div></div>
+                                        <div class="macro-val" id="macro-p-val">2g</div>
+                                    </div>
+                                    <div class="macro-col">
+                                        <div class="macro-label" id="macro-c-txt">Karb</div>
+                                        <div class="macro-bar c-bar"><div class="macro-progress" id="macro-c-progress" style="width: 15%;"></div></div>
+                                        <div class="macro-val" id="macro-c-val">9g</div>
+                                    </div>
+                                    <div class="macro-col">
+                                        <div class="macro-label" id="macro-f-txt">Yağ</div>
+                                        <div class="macro-bar f-bar"><div class="macro-progress" id="macro-f-progress" style="width: 75%;"></div></div>
+                                        <div class="macro-val" id="macro-f-val">15g</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Danger/Additives Warning (Premium Feature blurred for Free Users) -->
+                            <div class="card additives-card premium-blurred-card" id="additives-container">
+                                <div class="premium-lock-overlay" onclick="triggerPaywall('additives')">
+                                    <span class="lock-icon">🔒</span>
+                                    <p class="lock-text" id="lock-additives-txt">Katkı Maddeleri ve E-Kod Analizini Kilidini Aç (Premium)</p>
+                                </div>
+                                <h3 id="additives-title">🧪 Katkı Maddeleri & E-Kodları</h3>
+                                <div class="additives-list" id="additives-list-data">
+                                    <!-- Dynamically filled -->
+                                </div>
+                            </div>
+
+                            <!-- Benefits & Harms Side-by-Side -->
+                            <div class="dual-grid">
+                                <div class="card benefits-card">
+                                    <h3 class="green-title" id="benefits-title">👍 Faydaları</h3>
+                                    <ul id="benefits-list">
+                                        <!-- Dynamically filled -->
+                                    </ul>
+                                </div>
+                                <div class="card harms-card">
+                                    <h3 class="red-title" id="harms-title">👎 Zararları / Riskler</h3>
+                                    <ul id="harms-list">
+                                        <!-- Dynamically filled -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- 🤖 Yapay Zeka Özel Diyetisyen Analizi -->
+                            <div class="card ai-recommendation-card glow-card">
+                                <div class="ai-header">
+                                    <span class="ai-sparkles-icon">🤖</span>
+                                    <h3 id="ai-recommendation-title">Yapay Zeka Biyometrik Önerisi</h3>
+                                </div>
+                                <div class="ai-body">
+                                    <p id="ai-personal-recommendation">Kişiselleştirilmiş yapay zeka analiziniz hazırlanıyor...</p>
+                                </div>
+                            </div>
+
+                            <!-- 🎯 FOOD DIARY LOG & INSTAGRAM SHARE BUTTON ROW -->
+                            <div class="analysis-action-buttons-row" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0 0 0;">
+                                <button class="btn-complete-checkout log-diary-btn" onclick="logAnalyzedFoodToDiary()" style="background: linear-gradient(135deg, #10b981, #059669) !important; color: white !important; border: none !important; font-weight: 800; font-size: 11.5px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 8px; cursor: pointer;">
+                                    <span>🍳</span> Besini Günlüğe Kaydet (Log Food)
+                                </button>
+                                <button class="btn-complete-checkout ig-trigger-btn" onclick="openStoryShareModal()" style="background: linear-gradient(135deg, #c13584, #e1306c, #f77737) !important; color: white !important; border: none !important; font-weight: 800; font-size: 11px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.25) !important; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; padding: 10px; border-radius: 8px; cursor: pointer;">
+                                    <span>📱</span> Instagram Story'de Paylaş
+                                </button>
+                            </div>
+
+                            <!-- 🔍 GOOGLE LENS WEB ARAMA SONUÇLARI (SİBER EŞLEŞMELER) -->
+                            <div class="card google-lens-card glow-card" id="google-lens-card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(16, 185, 129, 0.15); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.05); margin-top: 15px;">
+                                <div class="lens-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.08); padding-bottom: 8px;">
+                                    <span class="lens-icon" style="font-size: 16px; animation: pulse 1.5s infinite;">🔍</span>
+                                    <h3 id="lens-title" style="margin: 0; font-size: 13px; color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Google Lens & Web Arama Eşleşmeleri</h3>
+                                </div>
+                                <div class="lens-body">
+                                    <p style="font-size: 12.5px; color: var(--color-text-sub); line-height: 1.5; margin: 0 0 12px 0;">
+                                        Gıda görüntüsü analiz edilerek siber tarayıcı yardımıyla internetteki benzer ürünler, makaleler ve klinik besin verileri listelendi:
+                                    </p>
+                                    <div class="lens-results-list" id="lens-results-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                        <!-- Dynamically populated -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Personalization Profiles Tabs -->
+                            <div class="card dietary-profile-card">
+                                <h3 id="diet-tab-header">🎯 Özel Beslenme Profilleri</h3>
+                                <div class="profile-tabs">
+                                    <button class="tab-btn active" onclick="switchDietTab('athlete')" id="tab-athlete-btn">🏃‍♂️ Sporcu</button>
+                                    <button class="tab-btn" onclick="switchDietTab('weight_loss')" id="tab-loss-btn">📉 Kilo Verme</button>
+                                    <button class="tab-btn" onclick="switchDietTab('weight_gain')" id="tab-gain-btn">📈 Kilo Alma</button>
+                                </div>
+                                <div class="profile-tab-content">
+                                    <div class="tab-panel active" id="tab-panel-athlete">
+                                        <div class="rating-row">
+                                            <span id="athlete-lbl">Sporcu Uygunluk Puanı:</span>
+                                            <span class="stars" id="athlete-stars">⭐⭐⭐⭐⭐</span>
+                                        </div>
+                                        <p class="diet-paragraph" id="athlete-recommendation">Yüksek kaliteli tekli doymamış yağlar barındırır. Kas yenilenmesini ve kardiyovasküler dayanıklılığı mükemmel seviyede destekler.</p>
+                                    </div>
+                                    <div class="tab-panel" id="tab-panel-weight_loss">
+                                        <div class="rating-row">
+                                            <span id="loss-lbl">Diyet/Kilo Verme Puanı:</span>
+                                            <span class="stars" id="loss-stars">⭐⭐⭐⭐</span>
+                                        </div>
+                                        <p class="diet-paragraph" id="loss-recommendation">Lifli yapısı sayesinde yüksek tokluk hissi sağlar ancak yağ oranından ötürü porsiyon kontrolü yapılmalıdır.</p>
+                                    </div>
+                                    <div class="tab-panel" id="tab-panel-weight_gain">
+                                        <div class="rating-row">
+                                            <span id="gain-lbl">Kilo Alma/Hacim Puanı:</span>
+                                            <span class="stars" id="gain-stars">⭐⭐⭐⭐⭐</span>
+                                        </div>
+                                        <p class="diet-paragraph" id="gain-recommendation">Hacim kazanmak isteyenler için mükemmel bir sağlıklı kalori kaynağıdır. Ara öğünlere eklenmesi önerilir.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Allergy Threat Alert Card -->
+                            <div class="card allergy-card" id="allergy-card-container">
+                                <div class="allergy-header">
+                                    <span class="allergy-alert-icon">⚠️</span>
+                                    <h3 id="allergy-title">Alerjen Uyarısı & Sağlık Riskleri</h3>
+                                </div>
+                                <div class="allergy-body" id="allergy-warnings-list">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                            
+                            <!-- E-commerce and alternative recommendation -->
+                            <div class="card alternatives-card premium-blurred-card" id="alternatives-container">
+                                <div class="premium-lock-overlay" onclick="triggerPaywall('alternatives')">
+                                    <span class="lock-icon">🔒</span>
+                                    <p class="lock-text" id="lock-alt-txt">Sağlıklı Alternatifler ve E-Market Fiyatlarını Aç (Premium)</p>
+                                </div>
+                                <h3 id="alt-title">🔄 Sağlıklı Alternatifler</h3>
+                                <div class="alternative-item">
+                                    <div class="alt-avatar">🍏</div>
+                                    <div>
+                                        <h4 class="alt-name" id="alt-item-name">Taze Yeşil Elma</h4>
+                                        <p class="alt-desc" id="alt-item-desc">Daha düşük kalori ve şeker arayanlar için mükemmel bir alternatiftir.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. PAYWALL VIEW (PREMIUM SATIN ALIM EKRANI) -->
+                        <div id="view-paywall" class="app-view">
+                            <div class="view-header">
+                                <button class="back-btn" onclick="switchView('home')" id="paywall-back-txt">⬅️ Kapat</button>
+                                <span class="badge premium-badge">💎 Premium</span>
+                            </div>
+
+                            <div class="paywall-hero">
+                                <h2>Brsko <span>PRO</span></h2>
+                                <p id="paywall-subtitle">Sınırsız tarama yapın, yapay zeka destekli diyetisyen koçunuza erişin ve tüm alerjen risklerini kaldırın!</p>
+                            </div>
+
+
+
+                            <!-- Pricing Tiers Grid -->
+                            <div class="pricing-container">
+                                <!-- Tier 1 -->
+                                <div class="pricing-card" onclick="selectPlan('starter', 20)">
+                                    <div class="tier-badge" id="tier-1-badge">Başlangıç</div>
+                                    <div class="tier-price">$20<span>/ay</span></div>
+                                    <ul class="tier-features">
+                                        <li id="t1-f1">✓ Aylık 50 Taramaya Kadar</li>
+                                        <li id="t1-f2">✓ Detaylı Makro & Kalori Raporu</li>
+                                        <li id="t1-f3">✓ Alerji Güvenlik Koruması</li>
+                                        <li class="disabled" id="t1-f4">✗ Yapay Zeka Diyetisyen Desteği</li>
+                                    </ul>
+                                    <button class="btn-tier-select" id="btn-select-t1" onclick="selectPlan('starter', 20); event.stopPropagation();">Seç</button>
+                                </div>
+
+                                <!-- Tier 2 (Recommended) -->
+                                <div class="pricing-card recommended" onclick="selectPlan('pro', 50)">
+                                    <div class="tier-badge popular" id="tier-popular-tag">🔥 En Popüler</div>
+                                    <div class="tier-title">Profesyonel</div>
+                                    <div class="tier-price">$50<span>/ay</span></div>
+                                    <ul class="tier-features">
+                                        <li id="t2-f1">✓ Sınırsız Kamera & Video Tarama</li>
+                                        <li id="t2-f2">✓ E-Kod ve Katkı Maddeleri Analizi</li>
+                                        <li id="t2-f3">✓ Gelişmiş Alerji Matrisi</li>
+                                        <li id="t2-f4">✓ Sağlıklı Market Alternatifleri</li>
+                                        <li id="t2-f5">✓ Yapay Zeka Diyetisyen Desteği</li>
+                                    </ul>
+                                    <button class="btn-tier-select" id="btn-select-t2" onclick="selectPlan('pro', 50); event.stopPropagation();">Aboneliği Başlat</button>
+                                </div>
+
+                                <!-- Tier 3 -->
+                                <div class="pricing-card" onclick="selectPlan('elite', 100)">
+                                    <div class="tier-badge" id="tier-3-badge">Seçkin Elit</div>
+                                    <div class="tier-price">$100<span>/ay</span></div>
+                                    <ul class="tier-features">
+                                        <li id="t3-f1">✓ Sınırsız Kamera & Video Tarama</li>
+                                        <li id="t3-f2">✓ Tüm Profesyonel Özellikler</li>
+                                        <li id="t3-f3">✓ 1-e-1 Uzman Diyetisyen Görüşmesi</li>
+                                        <li id="t3-f4">✓ Haftalık Özel Beslenme Menüsü</li>
+                                        <li id="t3-f5">✓ VIP Destek Hattı</li>
+                                    </ul>
+                                    <button class="btn-tier-select" id="btn-select-t3" onclick="selectPlan('elite', 100); event.stopPropagation();">VIP Üye Ol</button>
+                                </div>
+                            </div>
+
+                            <!-- 🎁 Promosyon / Aktivasyon Kodu Girişi -->
+                            <div class="card promo-code-card" style="margin-top: 20px; text-align: center; background: rgba(255, 255, 255, 0.03); border: var(--border-glass); padding: 15px 20px;">
+                                <h4 style="margin: 0 0 10px 0; font-size: 13px; color: var(--color-accent);">🎁 Promosyon Kodu / Aktivasyon</h4>
+                                <div style="display: flex; gap: 8px; justify-content: center; max-width: 320px; margin: 0 auto;">
+                                    <input type="text" id="promo-code-input" placeholder="KODUNUZU YAZIN" style="flex: 1; padding: 8px 12px; background: rgba(5,5,8,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; text-align: center; text-transform: uppercase; font-weight: bold; font-size: 12px;">
+                                    <button onclick="applyPromoCode()" style="padding: 8px 16px; background: var(--color-primary); color: #050508; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; transition: all 0.2s;">Uygula</button>
+                                </div>
+                                <p id="promo-status-msg" style="margin: 8px 0 0 0; font-size: 11px; color: var(--color-text-muted); font-weight: 600; min-height: 14px;"></p>
+                            </div>
+
+                            <!-- Multi-language Platform Info Footer -->
+                            <div class="paywall-assurance">
+                                <span class="shield-icon">🛡️</span>
+                                <p id="paywall-assurance-txt">Aboneliğinizi App Store ayarlardan veya Google hesabınızdan istediğiniz zaman iptal edebilirsiniz. 256-bit SSL güvenlikli altyapı.</p>
+                            </div>
+                        </div>
+
+                        <!-- 4. PROFILE / SETTINGS VIEW (PROFİL EKRANI) -->
+                        <div id="view-profile" class="app-view">
+                            <!-- Cover Photo / Header Banner -->
+                            <div class="profile-cover-banner">
+                                <div class="cover-neon-mesh"></div>
+                            </div>
+                            
+                            <!-- Profile Header Information -->
+                            <div class="profile-social-header">
+                                <div class="avatar-row">
+                                    <div class="profile-avatar-container">
+                                        <span class="avatar-emoji" id="profile-avatar-emoji">👤</span>
+                                        <div class="verified-badge">✓</div>
+                                    </div>
+                                    <div class="profile-stats-row">
+                                        <div class="stat-item">
+                                            <strong id="social-stat-posts">0</strong>
+                                            <span>Paylaşım</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <strong id="social-stat-followers">12.4K</strong>
+                                            <span>Takipçi</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <strong id="social-stat-following">342</strong>
+                                            <span>Takip</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="profile-bio-container">
+                                    <h3 class="profile-username" id="prof-user-title">@brsko_user</h3>
+                                    <span class="badge free-badge" id="prof-status-badge">Deneme Sürümü</span>
+                                    <p class="profile-bio-text" id="profile-bio-text">🔬 Siber Gıda Analisti | 🥦 Sağlıklı Yaşam Gezgini | 7/24 AI Koç Desteği Aktif</p>
+                                    <a href="#" class="profile-bio-link">🔗 brsko.ai/wellness_matrix</a>
+                                </div>
+                            </div>
+
+                            <!-- 3A. GUEST AUTHENTICATION INTERFACE (Visible if not logged in) -->
+                            <div id="profile-auth-panel" class="auth-panel-container siber-auth-card" style="padding: 20px; margin-top: 10px;">
+                                <div class="auth-header" style="text-align: center; margin-bottom: 15px;">
+                                    <div class="auth-logo-neon">🧪 BRSKO AI</div>
+                                    <p style="font-size: 10px; color: var(--color-text-muted); margin: 5px 0 0 0;">Bulut Senkronizasyonu & Güvenli Analiz Platformu</p>
+                                </div>
+
+                                <div class="auth-tabs">
+                                    <button class="auth-tab-btn active" id="tab-login-btn" onclick="switchAuthTab('login')">🔑 Giriş Yap</button>
+                                    <button class="auth-tab-btn" id="tab-signup-btn" onclick="switchAuthTab('signup')">📝 Kayıt Ol</button>
+                                </div>
+                                
+                                <!-- Login Form -->
+                                <div class="auth-form-panel active" id="auth-panel-login">
+                                    <div class="form-input-group">
+                                        <label id="lbl-login-username"><span class="input-icon">👤</span> Kullanıcı Adı veya E-posta</label>
+                                        <input type="text" id="login-username" class="onboard-siber-input neon-input" placeholder="Kullanıcı adınızı veya e-postanızı girin...">
+                                    </div>
+                                    <div class="form-input-group">
+                                        <label id="lbl-login-password"><span class="input-icon">🔒</span> Şifre</label>
+                                        <input type="password" id="login-password" class="onboard-siber-input neon-input" placeholder="Şifrenizi girin...">
+                                    </div>
+                                    <div class="auth-error-msg hidden" id="login-error-msg">❌ Geçersiz kullanıcı adı, e-posta veya şifre!</div>
+                                    <button class="btn-complete-checkout siber-btn-primary" onclick="executeLogin()">OTURUM AÇ ⚡</button>
+                                </div>
+                                
+                                <!-- Signup Form -->
+                                <div class="auth-form-panel" id="auth-panel-signup">
+                                    <div class="form-input-group">
+                                        <label id="lbl-signup-username"><span class="input-icon">👤</span> Kullanıcı Adı veya E-posta</label>
+                                        <input type="text" id="signup-username" class="onboard-siber-input neon-input" placeholder="E-posta veya benzersiz bir kullanıcı adı...">
+                                    </div>
+                                    <div class="form-input-group">
+                                        <label id="lbl-signup-password"><span class="input-icon">🔒</span> Şifre</label>
+                                        <input type="password" id="signup-password" class="onboard-siber-input neon-input" placeholder="Şifre belirleyin (En az 4 karakter)...">
+                                    </div>
+                                    <div class="auth-error-msg hidden" id="signup-error-msg">❌ Bu kullanıcı adı veya e-posta zaten kullanımda!</div>
+                                    <button class="btn-complete-checkout siber-btn-accent" onclick="executeSignup()">HESAP OLUŞTUR ✨</button>
+                                </div>
+
+                                <!-- SSO Buttons -->
+                                <div class="sso-divider">
+                                    <span id="auth-sso-or">veya</span>
+                                </div>
+                                <div class="sso-buttons-container">
+                                    <button class="btn-sso btn-sso-apple" onclick="executeSSOLogin('apple')">
+                                        <span class="sso-icon"></span> <span id="auth-sso-apple">Apple ID ile Giriş</span>
+                                    </button>
+                                    <button class="btn-sso btn-sso-google" onclick="executeSSOLogin('google')">
+                                        <span class="sso-icon">🌐</span> <span id="auth-sso-google">Google Hesabı ile Giriş</span>
+                                    </button>
+                                </div>
+
+
+                            </div>
+
+                            <!-- 3B. LOGGED IN PRIVATE VIEW (Hidden by default, displayed if logged in) -->
+                            <div id="profile-logged-in-container" class="hidden" style="padding: 0 16px;">
+                                <!-- Instagram/TikTok Style Feed View Tabs -->
+                                <div class="profile-feed-tabs">
+                                    <button class="feed-tab-btn active" id="feed-tab-posts" onclick="switchProfileFeedTab('posts')">🖼️ Paylaşımlar</button>
+                                    <button class="feed-tab-btn" id="feed-tab-saved" onclick="switchProfileFeedTab('saved')">🔖 Kaydedilenler</button>
+                                    <button class="feed-tab-btn" id="feed-tab-settings" onclick="switchProfileFeedTab('settings')">⚙️ Ayarlar</button>
+                                </div>
+                                
+                                <!-- Tab 1: Posts Grid (Recent Scans) -->
+                                <div class="profile-feed-panel active" id="profile-panel-posts">
+                                    <div class="posts-grid-container" id="profile-posts-grid">
+                                        <!-- Will be populated dynamically with user's scanned items! -->
+                                    </div>
+                                    <div class="empty-feed-placeholder hidden" id="posts-empty-placeholder">
+                                        <span>📷</span>
+                                        <p>Henüz bir yiyecek analizi yapmadınız. İlk taramanızı keşfet ekranından başlatın!</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab 2: Saved / Bookmarks -->
+                                <div class="profile-feed-panel" id="profile-panel-saved">
+                                    <div class="posts-grid-container" id="profile-saved-grid">
+                                        <!-- Premium static healthy bookmarks -->
+                                        <div class="post-grid-item" onclick="simulateScan('avokado')">
+                                            <span class="post-emoji">🥑</span>
+                                            <span class="post-score-badge green">95</span>
+                                            <span class="post-name-label">Avokado</span>
+                                        </div>
+                                        <div class="post-grid-item" onclick="simulateScan('elma')">
+                                            <span class="post-emoji">🍎</span>
+                                            <span class="post-score-badge green">80</span>
+                                            <span class="post-name-label">Elma</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab 3: Ayarlar / Settings -->
+                                <div class="profile-feed-panel" id="profile-panel-settings">
+                                    <!-- Subscription & Billing Management Card (Dynamic Status) -->
+                                    <div class="card settings-list-card" id="profile-billing-card" style="margin-top: 12px; background: rgba(255,255,255,0.01);">
+                                        <h4 class="settings-title" style="margin: 0 0 12px 0; color: var(--color-primary); font-family: var(--font-heading); display: flex; align-items: center; gap: 8px;">
+                                            <span>💳</span> Abonelik & Faturalandırma
+                                        </h4>
+                                        
+                                        <!-- Free Plan Status Block -->
+                                        <div id="billing-status-free" class="billing-status-block">
+                                            <p style="font-size: 11px; color: var(--color-text-sub); margin: 0 0 12px 0; line-height: 1.5;">Deneme sürümündesiniz. Sınırsız canlı besin analizi ve 7/24 AI sağlık koçu desteği için planlarımızı keşfedin.</p>
+                                            <button class="btn-complete-checkout" style="background: linear-gradient(135deg, var(--color-primary), #059669); color: white; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px;" onclick="switchView('paywall')">Aboneliği Yükselt</button>
+                                        </div>
+                                        
+                                        <!-- Premium Active Status Block -->
+                                        <div id="billing-status-premium" class="billing-status-block hidden">
+                                            <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub);">
+                                                    <span>Aktif Plan:</span>
+                                                    <strong style="color: var(--color-primary);" id="bill-val-tier">Brsko PRO</strong>
+                                                </div>
+                                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub);">
+                                                    <span>Kalan Süre:</span>
+                                                    <strong style="color: white;" id="bill-val-days">30 Gün Kaldı</strong>
+                                                </div>
+                                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub);">
+                                                    <span>Faturalandırma:</span>
+                                                    <strong style="color: #10b981;" id="bill-val-renewal">Otomatik Yenileme (Aktif)</strong>
+                                                </div>
+                                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub);">
+                                                    <span>Yenilenme Tarihi:</span>
+                                                    <strong style="color: white;" id="bill-val-date">28 Haziran 2026</strong>
+                                                </div>
+                                            </div>
+                                            <p style="font-size: 10px; color: var(--color-text-sub); line-height: 1.5; margin: 0 0 12px 0;">Ödemeleriniz ve kart tahsilatlarınız **Whop.com** güvencesiyle otomatik gerçekleştirilir.</p>
+                                            <button class="btn-complete-checkout" style="background: linear-gradient(135deg, var(--color-accent), #d97706); color: black; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px;" onclick="switchView('paywall')">Aboneliği Yükselt / Planları İncele 👑</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Application Settings Card -->
+                                    <div class="card settings-list-card" style="background: rgba(255,255,255,0.01); margin-top: 12px;">
+                                        <h4 class="settings-title" id="prof-sett-title" style="margin: 0 0 12px 0;">⚙️ Uygulama Ayarları</h4>
+                                        
+                                        <div class="setting-row" style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span id="prof-lbl-lang" style="font-size: 11px; color: var(--color-text-sub);">Dil Değiştir</span>
+                                            <select class="settings-select" id="lang-select-mobile" onchange="changeLanguage(this.value)" style="background: #111; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; font-size: 11px;">
+                                                <option value="tr">🇹🇷 Türkçe (TR)</option>
+                                                <option value="en">🇺🇸 English (EN)</option>
+                                        <option value="es">🇪🇸 Español (ES)</option>
+                                                <option value="de">🇩🇪 Deutsch (DE)</option>
+                                                <option value="ar">🇸🇦 العربية (AR)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Scanning Stats Card -->
+                                    <div class="card settings-list-card" style="background: rgba(255,255,255,0.01); margin-top: 12px;">
+                                        <h4 class="settings-title" id="prof-stat-title" style="margin: 0 0 12px 0;">📊 Tarama İstatistikleri</h4>
+                                        <div class="setting-stat-row" style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub); margin-bottom: 8px;">
+                                            <span id="prof-lbl-totals">Toplam Tarama:</span>
+                                            <strong id="stat-total-scans" style="color: white;">0</strong>
+                                        </div>
+                                        <div class="setting-stat-row" style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-sub);">
+                                            <span id="prof-lbl-remaining">Kalan Ücretsiz Hak:</span>
+                                            <strong id="stat-remaining-scans" style="color: var(--color-primary);">3</strong>
+                                        </div>
+                                    </div>
+
+                                     <!-- Logout Card -->
+                                     <div class="card settings-list-card siber-logout-card" style="margin-top: 16px; border: 1px solid rgba(239, 68, 68, 0.15); background: rgba(239, 68, 68, 0.02); padding: 12px; border-radius: 8px; text-align: center;">
+                                         <div class="cloud-sync-badge" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 9px; color: #10b981; margin-bottom: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                                             <span class="pulse-dot" style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #10b981; animation: activeGlowPulse 1s infinite alternate;"></span>
+                                             🟢 Bulut Eşitleme Aktif (Supabase)
+                                         </div>
+                                         <button class="btn-reset-data siber-btn-danger" onclick="executeLogout()" style="background: linear-gradient(135deg, #ef4444, #991b1b); color: white; border: 1px solid rgba(239,68,68,0.3); width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; cursor: pointer; display: block !important; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(239,68,68,0.15); transition: all 0.3s ease;">🔒 Güvenli Oturumu Kapat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. SOCIAL REELS / SHORTS VIDEO FEED VIEW (REELS EKRANI) -->
+
+
+
+
+                    </main>
+
+                    <!-- APPLE IN-APP PURCHASE BOTTOM SHEET (iOS SATIN ALMA EKRANI) -->
+                    <div class="apple-iap-backdrop hidden" id="apple-iap-sheet">
+                        <div class="apple-iap-container">
+                            <div class="iap-pull-bar"></div>
+                            
+                            <!-- Header -->
+                            <div class="iap-header">
+                                <div class="app-logo-squircle">🥗</div>
+                                <div class="app-details">
+                                    <h3 class="app-title">Brsko AI</h3>
+                                    <p class="app-developer">Antigravity Labs Inc.</p>
+                                    <p class="app-in-app-tag" id="iap-iap-tag">Uygulama İçi Satın Alım</p>
+                                </div>
+                            </div>
+                            
+                            <hr class="iap-divider">
+                            
+                            <!-- Details -->
+                            <div class="iap-details-list">
+                                <div class="iap-detail-row">
+                                    <span class="detail-label" id="iap-lbl-sub">Abonelik</span>
+                                    <span class="detail-value" id="iap-val-plan">Brsko Pro (Aylık)</span>
+                                </div>
+                                <div class="iap-detail-row">
+                                    <span class="detail-label" id="iap-lbl-price">Fiyat</span>
+                                    <span class="detail-value text-bold" id="iap-val-price">$50.00 / ay</span>
+                                </div>
+                                <div class="iap-detail-row">
+                                    <span class="detail-label" id="iap-lbl-account">Apple Kimliği</span>
+                                    <span class="detail-value">kaygi@icloud.com</span>
+                                </div>
+                                <div class="iap-detail-row">
+                                    <span class="detail-label" id="iap-lbl-paymethod">Ödeme Yöntemi</span>
+                                    <span class="detail-value"> Pay (Visa •••• 8899)</span>
+                                </div>
+                            </div>
+                            
+                            <!-- iOS FaceID Interaction State -->
+                            <div class="faceid-trigger-area" onclick="triggerFaceIDScan()">
+                                <div class="faceid-outer-ring" id="faceid-ring">
+                                    <!-- Animated FaceID Icon -->
+                                    <svg viewBox="0 0 100 100" class="faceid-svg" id="faceid-svg-icon">
+                                        <path d="M25,35 Q25,25 35,25 T45,25" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M75,35 Q75,25 65,25 T55,25" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M25,65 Q25,75 35,75 T45,75" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M75,65 Q75,75 65,75 T55,75" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M40,45 Q50,45 50,55" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M60,45 Q50,45 50,55" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                        <path d="M35,60 Q50,68 65,60" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                    </svg>
+                                    
+                                    <!-- Success Checkmark -->
+                                    <div class="success-checkmark hidden" id="faceid-success-tick">
+                                        <svg viewBox="0 0 52 52" class="checkmark-svg">
+                                            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="faceid-status-text" id="faceid-prompt">Ödemek İçin Buraya Tıklayın (FaceID)</p>
+                            </div>
+                            
+                            <div class="iap-cancel-btn" onclick="closePaymentModal()" id="iap-btn-cancel">İptal Et</div>
+                        </div>
+                    </div>
+
+                    <!-- GOOGLE PAY WEB MODAL (GOOGLE PAY MODAL EKRANI) -->
+                    <div class="gpay-backdrop hidden" id="gpay-modal">
+                        <div class="gpay-container">
+                            <div class="gpay-top-bar">
+                                <div class="gpay-logo">
+                                    <span class="gpay-g">G</span><span class="gpay-pay">Pay</span>
+                                </div>
+                                <div class="gpay-close" onclick="closePaymentModal()">✕</div>
+                            </div>
+                            
+                            <div class="gpay-merchant-info">
+                                <div class="gpay-merchant-avatar">🥗</div>
+                                <div>
+                                    <h3 class="gpay-merchant-name">Brsko AI</h3>
+                                    <p class="gpay-merchant-url">https://brsko.ai</p>
+                                </div>
+                            </div>
+                            
+                            <div class="gpay-amount-block">
+                                <span id="gpay-lbl-price">Ödenecek Tutar</span>
+                                <strong id="gpay-val-price">$50.00</strong>
+                            </div>
+                            
+                            <div class="gpay-payment-details">
+                                <div class="gpay-card-selector">
+                                    <span class="gpay-card-icon">💳</span>
+                                    <div class="gpay-card-info">
+                                        <p class="gpay-card-num">Google Account (Visa •••• 4242)</p>
+                                        <p class="gpay-user-email">kaygi@gmail.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="gpay-actions">
+                                <button class="btn-gpay-confirm" onclick="triggerGooglePayProcess()">
+                                    <span id="gpay-btn-text">Google Pay ile Öde</span>
+                                </button>
+                                <button class="btn-gpay-cancel" onclick="closePaymentModal()" id="gpay-btn-cancel">İptal</button>
+                            </div>
+
+                            <!-- Google Pay Loading Spinner Overlay -->
+                            <div class="gpay-loading-overlay hidden" id="gpay-loading">
+                                <div class="gpay-spinner"></div>
+                                <p id="gpay-loading-txt">Google Pay İşleniyor...</p>
+                            </div>
+                            
+                            <!-- Google Pay Success State -->
+                            <div class="gpay-success-overlay hidden" id="gpay-success">
+                                <div class="gpay-success-circle">
+                                    <svg viewBox="0 0 52 52" class="gpay-check-svg">
+                                        <path class="gpay-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                    </svg>
+                                </div>
+                                <h3 id="gpay-success-title">Ödeme Başarılı!</h3>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 3D SECURE BANK AUTHORIZATION MODAL (3D SECURE BANKA ONAY EKRANI) -->
+                    <div class="threed-backdrop hidden" id="threed-modal">
+                        <div class="threed-container">
+                            <div class="threed-header">
+                                <span class="threed-lock">🔒</span>
+                                <h4>Verified by VISA / Mastercard ID Check</h4>
+                            </div>
+                            <div class="threed-bank-logo">🏦 SECURE BANK DIRECT</div>
+                            
+                            <div class="threed-details">
+                                <div class="threed-row">
+                                    <span class="threed-lbl">İşyeri (Merchant):</span>
+                                    <strong class="threed-val">Brsko AI</strong>
+                                </div>
+                                <div class="threed-row">
+                                    <span class="threed-lbl">Tutar (Amount):</span>
+                                    <strong class="threed-val" id="threed-amount">$50.00</strong>
+                                </div>
+                                <div class="threed-row">
+                                    <span class="threed-lbl">Kart (Card):</span>
+                                    <strong class="threed-val" id="threed-card-display">Visa •••• 4242</strong>
+                                </div>
+                            </div>
+                            
+                            <p class="threed-info" id="threed-info-text">Lütfen telefonunuza SMS ile gönderilen 6 haneli 3D şifresini giriniz.</p>
+                            
+                            <div class="threed-input-group">
+                                <input type="text" id="threed-code-input" placeholder="------" maxlength="6">
+                                <button onclick="submitMock3DCode()" id="threed-submit-btn">Onayla / Confirm</button>
+                            </div>
+                            
+                            <p class="threed-timer">Kalan Süre: <span id="threed-timer-sec">180</span> sn</p>
+                        </div>
+                    </div>
+
+                    <!-- iOS PUSH SMS NOTIFICATION BANNER (SMS BİLDİRİM BANNERI) -->
+                    <div class="sms-banner hidden" id="sms-notification" onclick="copySmsCode()">
+                        <div class="sms-header">
+                            <span class="sms-app">💬 MESAJLAR</span>
+                            <span class="sms-time">şimdi</span>
+                        </div>
+                        <div class="sms-body">
+                            <strong>SecureBank:</strong> Brsko AI alışverişiniz için 3D şifreniz: <strong id="sms-code-val">482910</strong>. Şifreyi kimseyle paylaşmayın.
+                        </div>
+                    </div>
+
+                    <!-- APP BOTTOM NAVIGATION BAR (GOLD GLASSMORPHISM) -->
+                    <nav class="app-bottom-nav">
+                        <button class="nav-item active" onclick="switchView('home')" id="nav-btn-home">
+                            <span class="nav-icon">🤖</span>
+                            <span class="nav-label">Brsko AI</span>
+                        </button>
+
+                        <button class="nav-item" onclick="switchView('profile')" id="nav-btn-profile">
+                            <span class="nav-icon">👤</span>
+                            <span class="nav-label">Profil</span>
+                        </button>
+                        <button class="nav-item" onclick="switchView('paywall')" id="nav-btn-premium">
+                            <span class="nav-icon">👑</span>
+                            <span class="nav-label">Pro</span>
+                        </button>
+                    </nav>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REELS COMMENTS DRAWER (YORUMLAR ÇEKMECESİ - SLIDES UP FROM BOTTOM OF PHONE SCREEN) -->
+    <div class="reels-comments-backdrop hidden" id="reels-comments-backdrop" onclick="closeCommentsDrawer()">
+        <div class="reels-comments-drawer" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <div class="drawer-pull-bar"></div>
+                <h4 id="lbl-comments-drawer-title">Yorumlar</h4>
+                <span class="drawer-close-btn" onclick="closeCommentsDrawer()">✕</span>
+            </div>
+            
+            <!-- Comments Scroll Area -->
+            <div class="drawer-comments-list" id="reels-comments-list">
+                <!-- Comments will be populated dynamically -->
+            </div>
+            
+            <!-- Rich Comment Action Inputs Bar -->
+            <div class="drawer-comment-input-area">
+                <!-- Preview attachment slot -->
+                <div class="comment-attachment-preview hidden" id="comment-attachment-preview">
+                    <span class="attach-preview-icon">📎</span>
+                    <span class="attach-preview-filename" id="comment-attachment-name">resim.jpg</span>
+                    <button class="btn-remove-attach" onclick="removeCommentAttachment()">✕</button>
+                </div>
+                
+                <!-- Audio Wave Visualizer slot (Microphone Waveform) -->
+                <div class="comment-audio-record-overlay hidden" id="comment-audio-record-overlay">
+                    <div class="audio-record-wave-bars" id="audio-wave-bars">
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                        <span class="wave-bar"></span>
+                    </div>
+                    <span class="audio-record-timer" id="audio-record-timer">00:00</span>
+                    <button class="btn-stop-audio-rec" onclick="stopAudioRecording()">🔴 Durdur</button>
+                </div>
+                
+                <div class="comment-text-input-row">
+                    <input type="text" id="comment-input-field" placeholder="Yorum yaz...">
+                    
+                    <!-- File Clip Picker -->
+                    <label class="comment-icon-btn" title="Fotoğraf/Video Ekle">
+                        📁
+                        <input type="file" id="comment-file-input" accept="image/*,video/*" class="hidden" onchange="handleCommentFileSelect(event)">
+                    </label>
+                    
+                    <!-- Audio Mic Button -->
+                    <button class="comment-icon-btn" id="btn-mic-rec" onclick="startAudioRecording()" title="Sesli Yorum Yap">
+                        🎤
+                    </button>
+                    
+                    <!-- Giphy GIF Button -->
+                    <button class="comment-icon-btn" onclick="toggleGifPicker(true)" title="GIF Ekle">
+                        👾
+                    </button>
+                    
+                    <button class="comment-send-btn" onclick="submitRichComment()" id="btn-submit-comment">Gönder</button>
+                </div>
+                
+                <!-- Giphy GIF Search Grid Picker -->
+                <div class="giphy-picker-container hidden" id="giphy-picker-container">
+                    <div class="giphy-picker-search-bar">
+                        <input type="text" id="giphy-search-input" placeholder="GIF Ara..." onkeyup="searchGiphyGifs(this.value)">
+                        <button class="giphy-picker-close" onclick="toggleGifPicker(false)">✕</button>
+                    </div>
+                    <div class="giphy-gifs-grid" id="giphy-gifs-grid">
+                        <!-- GIFs populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MUSIC SELECTOR MODAL (MÜZİK SEÇME EKRANI) -->
+    <div class="music-modal-backdrop hidden" id="music-selector-modal" onclick="closeMusicSelector()">
+        <div class="music-modal-container" onclick="event.stopPropagation()">
+            <div class="music-modal-header">
+                <h4 id="lbl-music-picker-title">Müzik Seç</h4>
+                <span class="music-modal-close" onclick="closeMusicSelector()">✕</span>
+            </div>
+            <div class="music-modal-body">
+                <div class="music-search-box">
+                    <input type="text" id="music-search-input" placeholder="Şarkı veya Sanatçı Ara..." onkeyup="searchMusicTracks(this.value)">
+                </div>
+                <div class="music-tracks-list" id="music-tracks-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE SHEET MODAL (SOSYAL MEDYA PAYLAŞIM EKRANI) -->
+    <div class="share-modal-backdrop hidden" id="share-sheet-modal" onclick="closeShareSheet()">
+        <div class="share-modal-container" onclick="event.stopPropagation()">
+            <div class="share-modal-header">
+                <h4 id="lbl-share-title">Paylaş</h4>
+                <span class="share-modal-close" onclick="closeShareSheet()">✕</span>
+            </div>
+            <div class="share-modal-body">
+                <div class="share-options-grid">
+                    <div class="share-option-item" onclick="simulateSocialShare('instagram')">
+                        <span class="share-logo logo-ig">📸</span>
+                        <span>Instagram Hikaye</span>
+                    </div>
+                    <div class="share-option-item" onclick="simulateSocialShare('whatsapp')">
+                        <span class="share-logo logo-wa">💬</span>
+                        <span>WhatsApp Durum</span>
+                    </div>
+                    <div class="share-option-item" onclick="simulateSocialShare('tiktok')">
+                        <span class="share-logo logo-tt">🎬</span>
+                        <span>TikTok Video</span>
+                    </div>
+                    <div class="share-option-item" onclick="simulateSocialShare('copy')">
+                        <span class="share-logo logo-link">🔗</span>
+                        <span>Bağlantıyı Kopyala</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MANUAL CALORIE LOG MODAL -->
+    <div class="calorie-modal-backdrop hidden" id="add-calorie-modal">
+        <div class="calorie-modal-container">
+            <div class="calorie-modal-header">
+                <h4 id="modal-add-cal-title">Manuel Yemek ve Kalori Ekle</h4>
+                <span class="calorie-modal-close" onclick="closeAddCalorieModal()">✕</span>
+            </div>
+            <div class="calorie-modal-body">
+                <div class="form-input-group">
+                    <label id="modal-lbl-food">Yemek Adı (Food Name)</label>
+                    <input type="text" id="modal-input-food" placeholder="Örn: Yulaf Ezmesi, Tavuklu Salata...">
+                </div>
+                <div class="form-input-group">
+                    <label id="modal-lbl-cal">Kalori (Kcal)</label>
+                    <input type="number" id="modal-input-calories" placeholder="Örn: 350">
+                </div>
+                <button class="btn-complete-checkout" onclick="submitManualCalorie()" id="modal-add-cal-btn">Yemeği Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTAGRAM STORY SHARE MODAL -->
+    <div class="story-share-modal-backdrop hidden" id="story-share-modal">
+        <div class="story-share-modal-container">
+            <div class="story-share-modal-header">
+                <h4 id="story-share-title">Story Tasarımcısı</h4>
+                <span class="story-share-modal-close" onclick="closeStoryShareModal()">✕</span>
+            </div>
+            <div class="story-share-modal-body">
+                <!-- 9:16 Story Preview Card -->
+                <div class="story-preview-card" id="story-preview-card">
+                    <!-- Story Dynamic Preview Canvas -->
+                    <div class="story-preview-inner template-cyberpunk" id="story-preview-inner">
+                        <!-- Cyber HUD Elements -->
+                        <div class="story-hud-grid">
+                            <div class="story-hud-left">BRSKO // HIKAYE</div>
+                            <div class="story-hud-right" id="story-story-time">23:31</div>
+                        </div>
+                        
+                        <!-- Central Content -->
+                        <div class="story-main-info">
+                            <div class="story-food-emoji" id="story-food-emoji">🍉</div>
+                            <h2 class="story-food-name" id="story-food-name">Avokado</h2>
+                            <p class="story-food-calories" id="story-food-calories">160 Kcal (100g)</p>
+                        </div>
+                        
+                        <!-- Visual Graphic Overlay -->
+                        <div class="story-cyber-brackets">
+                            <div class="story-bracket-tl"></div>
+                            <div class="story-bracket-tr"></div>
+                            <div class="story-bracket-bl"></div>
+                            <div class="story-bracket-br"></div>
+                        </div>
+                        
+                        <!-- Bottom Metric Badges -->
+                        <div class="story-footer-metrics">
+                            <div class="story-metric-pill bg-primary">
+                                <span class="pill-lbl">Skor:</span>
+                                <span class="pill-val" id="story-health-score">80</span>
+                            </div>
+                            <div class="story-metric-pill bg-accent">
+                                <span class="pill-lbl">Kcal:</span>
+                                <span class="pill-val" id="story-calories">160</span>
+                            </div>
+                            <div class="story-metric-pill bg-danger" id="story-additives-badge">
+                                <span class="pill-lbl">Katkı:</span>
+                                <span class="pill-val" id="story-additives-count">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Watermark -->
+                        <div class="story-watermark">
+                            <span class="watermark-logo">⚡ BRSKO AI</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filter Selector Row -->
+                <div class="filter-selector-label">Şablon ve Filtre Seçin:</div>
+                <div class="filter-selector-row">
+                    <button class="filter-chip active" id="filter-btn-cyberpunk" onclick="applyStoryFilter('cyberpunk')">
+                        <span class="filter-icon">🟢</span> Siber Neon
+                    </button>
+                    <button class="filter-chip" id="filter-btn-minimal" onclick="applyStoryFilter('minimal')">
+                        <span class="filter-icon">⚪</span> Sade Premium
+                    </button>
+                    <button class="filter-chip" id="filter-btn-organic" onclick="applyStoryFilter('organic')">
+                        <span class="filter-icon">🟡</span> Altın Gurme
+                    </button>
+                    <button class="filter-chip" id="filter-btn-raw" onclick="applyStoryFilter('raw')">
+                        <span class="filter-icon">📷</span> Sadece Foto
+                    </button>
+                </div>
+                
+                <!-- Export Actions -->
+                <button class="btn-complete-checkout ig-share-btn" onclick="exportAndShareStory()">
+                    <span class="btn-share-icon">📸</span> Hikayede Paylaş
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Beeps for iOS confirmation (Simulated by Web Audio API in app.js) -->
+
+    <!-- Application Script -->
+    <script src="app.js?v=2026.05.28.13.20"></script>
+</body>
+</html>
