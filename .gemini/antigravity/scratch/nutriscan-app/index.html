@@ -556,27 +556,30 @@
                         </div>
 
                         <!-- 1. HOME VIEW (ANA EKRAN) -->
-                        <div id="view-home" class="app-view active">
+                                                <div id="view-home" class="app-view active">
 
                             <!-- Neon Glowing BRSKO AI Brand Logo -->
                             <div class="neon-divider-logo">BRSKO AI</div>
 
-                            <!-- 🤖 BRSKO AI CHAT WIDGET -->
-                            <div class="card search-card brsko-chat-card">
-                                <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 8px;">
-                                    <span class="status-blink"></span>
-                                    <h3 class="section-title" id="search-title" style="margin: 0; font-size: 13px; color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🤖 Brsko AI Chat</h3>
+                            <!-- 🤖 BRSKO AI PURE CHAT INTERFACE -->
+                            <div class="card search-card brsko-chat-card" style="margin-top: 10px; background: rgba(8, 8, 12, 0.72) !important; border: 1px solid rgba(16, 185, 129, 0.28) !important; border-radius: 20px !important; padding: 16px !important; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(16, 185, 129, 0.08) !important; display: flex; flex-direction: column; gap: 10px;">
+                                <div class="chat-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="status-blink"></span>
+                                        <h3 class="section-title" id="search-title" style="margin: 0; font-size: 13px; color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🤖 Brsko AI Chat</h3>
+                                    </div>
+                                    <span style="font-size: 8px; color: rgba(255, 255, 255, 0.4); font-family: monospace; font-weight: 700;">MODEL: GEMINI 2.5</span>
                                 </div>
                                 
-                                <!-- Dynamic Chat Messages Box -->
-                                <div class="home-chat-messages" id="home-chat-messages-box">
+                                <!-- Dynamic Chat Messages Box (Taller for deep messaging) -->
+                                <div class="home-chat-messages" id="home-chat-messages-box" style="height: 290px !important; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px; box-sizing: border-box; text-align: left; font-size: 11.5px; scrollbar-width: none;">
                                     <div class="chat-msg message-ai">
                                         <strong>Brsko AI:</strong> Merhaba! Ben senin kişisel yapay zeka sağlık ve besin asistanınım. Biyometrik verilerine göre sana özel öneriler verebilirim. Herhangi bir gıdayı, kaloriyi veya diyet tavsiyesini sorabilirsin! ⚡
                                     </div>
                                 </div>
                                 
                                 <!-- Quick Chat Chips (Öneri Sorular) -->
-                                <div class="chat-chips-row" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none;">
+                                <div class="chat-chips-row" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none;">
                                     <button class="chat-chip" onclick="sendQuickHomeChatMessage('🥑 Avokado faydalı mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🥑 Avokado?</button>
                                     <button class="chat-chip" onclick="sendQuickHomeChatMessage('🍬 Şeker kilo aldırır mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🍬 Şeker?</button>
                                     <button class="chat-chip" onclick="sendQuickHomeChatMessage('🏋️ Kaç gr protein almalıyım?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🏋️ Protein?</button>
@@ -589,32 +592,22 @@
                                 </div>
                             </div>
 
-                            <!-- Scanning Limit Progress Bar -->
-                            <div class="scan-limit-card" style="display: none;">
-                                <div class="limit-header">
-                                    <span id="limit-title">Ücretsiz Deneme Taramaları</span>
-                                    <span class="limit-badge" id="limit-counter">3/3</span>
-                                </div>
-                                <div class="limit-progress-bg">
-                                    <div class="limit-progress-bar" id="limit-progress" style="width: 100%;"></div>
-                                </div>
-                                <p class="limit-info" id="limit-info-txt">Sınırsız analiz için Premium'a yükseltin.</p>
-                            </div>
-
                             <!-- 📷 LAUNCH LIVE CAMERA ACTION CARD -->
-                            <div class="card wellness-card camera-launcher-card" style="margin-top: 15px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 20, 25, 0.8) 100%); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.06); text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center;">
-                                <span style="font-size: 32px; animation: pulse 1.5s infinite;">📷</span>
-                                <h4 style="color: var(--color-primary); font-size: 14.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">SİBER ANALİZ KAMERASI</h4>
-                                <p style="font-size: 11px; color: var(--color-text-sub); margin: 0; line-height: 1.4;">
-                                    Kameranızı açın ve gıdaları siber tarayıcı ile anında analiz edin! Faydalarını, zararlarını ve hücresel kalori değerlerini anında keşfedin.
-                                </p>
-                                <button class="btn-activate-cam-launcher siber-btn-accent" onclick="initCamera(); document.getElementById('camera-viewport').scrollIntoView({ behavior: 'smooth' });" style="width: 100%; height: 42px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), #10b981); color: #050508; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35); transition: all 0.3s ease;">
-                                    📷 CANLI SİBER KAMERAYI AÇ 🚀
+                            <div class="card wellness-card camera-launcher-card" style="margin-top: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(20, 20, 25, 0.8) 100%); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 16px; padding: 12px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); text-align: center; display: flex; flex-direction: row; gap: 12px; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 10px; text-align: left;">
+                                    <span style="font-size: 24px; animation: floatEmoji 3s ease-in-out infinite;">📷</span>
+                                    <div>
+                                        <h4 style="color: var(--color-primary); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">SİBER GIDA KAMERASI</h4>
+                                        <p style="font-size: 9px; color: var(--color-text-sub); margin: 2px 0 0 0; line-height: 1.3;">Gıdaları siber tarayıcı ile tarayarak analiz edin.</p>
+                                    </div>
+                                </div>
+                                <button class="btn-activate-cam-launcher siber-btn-accent" onclick="initCamera(); document.getElementById('camera-viewport').scrollIntoView({ behavior: 'smooth' });" style="width: 80px; height: 32px; font-size: 10px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), #10b981); color: #050508; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25); transition: all 0.3s ease;">
+                                    AÇ 🚀
                                 </button>
                             </div>
 
                             <!-- Dynamic Early Warning Banner (Amber glowing, rich emojis) -->
-                            <div id="early-warning-banner" class="early-warning-banner hidden">
+                            <div id="early-warning-banner" class="early-warning-banner hidden" style="margin-top: 10px;">
                                 <div class="warning-content">
                                     <span class="warning-icon">⚠️🚨</span>
                                     <span id="early-warning-txt">Son 1 Ücretsiz Analiz Hakkınız Kaldı! Kesintisiz siber tarama ve limitsiz AI koçluğu için şimdi Premium'a geçin! ⚡💎</span>
@@ -622,64 +615,8 @@
                                 <button class="btn-warning-action" onclick="switchView('paywall')">Premium Yükselt 👑</button>
                             </div>
 
-                            <!-- Daily Wellness Trackers Dashboard -->
-                            <div class="wellness-trackers-dashboard">
-                                <!-- Calorie Tracker Widget -->
-                                <div class="card wellness-card calorie-tracker-widget">
-                                    <h4 class="widget-title" id="well-calorie-title">🔥 Günlük Kalori Takipçisi</h4>
-                                    <div class="calorie-widget-content">
-                                        <div class="cal-gauge-wrapper">
-                                            <svg viewBox="0 0 100 100" class="cal-gauge-svg">
-                                                <circle cx="50" cy="50" r="40" class="cal-gauge-bg"></circle>
-                                                <circle cx="50" cy="50" r="40" class="cal-gauge-fill" id="cal-gauge-fill-ring" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
-                                            </svg>
-                                            <div class="cal-gauge-text">
-                                                <span class="cal-value" id="well-cal-consumed">0</span>
-                                                <span class="cal-slash">/</span>
-                                                <span class="cal-target" id="well-cal-target">2250</span>
-                                                <span class="cal-unit">kcal</span>
-                                            </div>
-                                        </div>
-                                        <div class="cal-stats">
-                                            <div class="cal-stat-col">
-                                                <span class="cal-stat-lbl" id="well-cal-lbl-rem">Kalan</span>
-                                                <span class="cal-stat-val text-green" id="well-cal-remaining">2250</span>
-                                            </div>
-                                            <button class="btn-add-calorie" onclick="openAddCalorieModal()" id="well-btn-add-cal">+ Yemek Ekle</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Water Cup Logger Widget -->
-                                <div class="card wellness-card water-tracker-widget">
-                                    <h4 class="widget-title" id="well-water-title">💧 Su İçme Takibi</h4>
-                                    <div class="water-widget-content">
-                                        <!-- Interactive Glassmorphic Wave Water Cup -->
-                                        <div class="water-cup-container" onclick="logWaterCup()">
-                                            <div class="water-glass">
-                                                <!-- Wavy dynamic water fill -->
-                                                <div class="water-fill" id="water-fill-wave" style="height: 0%;">
-                                                    <div class="water-wave wave-front"></div>
-                                                    <div class="water-wave wave-back"></div>
-                                                </div>
-                                            </div>
-                                            <span class="water-cup-plus">+</span>
-                                        </div>
-                                        <div class="water-stats">
-                                            <div class="water-stat-row">
-                                                <span class="water-val" id="well-water-logged">0</span>
-                                                <span class="water-slash">/</span>
-                                                <span class="water-target" id="well-water-target">3000</span>
-                                                <span class="water-unit">ml</span>
-                                            </div>
-                                            <button class="btn-add-water" onclick="logWaterCup()" id="well-btn-add-water">+ 250ml Su Ekle</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Live Camera Scanner Simulator -->
-                            <div class="scanner-container">
+                            <div class="scanner-container" style="margin-top: 10px;">
                                 <!-- Real Webcam Video or Dynamic Interactive Placeholder -->
                                 <div class="camera-viewport" id="camera-viewport">
                                     <video id="webcam-stream" autoplay playsinline muted class="hidden"></video>
@@ -736,16 +673,6 @@
                                         <div class="spinner"></div>
                                         <span id="scanning-label">Yapay Zeka Analiz Ediyor...</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Upload Image/Video Area -->
-                            <div class="upload-card">
-                                <h3 class="section-title" id="upload-title">📤 Fotoğraf veya Video Analizi</h3>
-                                <div class="upload-dropzone" id="dropzone" onclick="triggerFileInput()">
-                                    <div class="drop-icon">📁</div>
-                                    <p class="drop-text" id="drop-text-txt">Görsel / Video yükleyin veya sürükleyin</p>
-                                    <input type="file" id="file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelect(event)">
                                 </div>
                             </div>
                         </div>
