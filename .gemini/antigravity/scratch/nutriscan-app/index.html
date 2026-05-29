@@ -556,23 +556,20 @@
                         </div>
 
                         <!-- 1. HOME VIEW (ANA EKRAN) -->
-                                                <div id="view-home" class="app-view active">
+                                                                        <div id="view-home" class="app-view active" style="padding: 12px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box;">
 
-                            <!-- Neon Glowing BRSKO AI Brand Logo -->
-                            <div class="neon-divider-logo">BRSKO AI</div>
-
-                            <!-- 🤖 BRSKO AI PURE CHAT INTERFACE -->
-                            <div class="card search-card brsko-chat-card" style="margin-top: 10px; background: rgba(8, 8, 12, 0.72) !important; border: 1px solid rgba(16, 185, 129, 0.28) !important; border-radius: 20px !important; padding: 16px !important; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(16, 185, 129, 0.08) !important; display: flex; flex-direction: column; gap: 10px;">
+                            <!-- 🤖 BRSKO AI PURE IMMERSIVE CHAT INTERFACE (FULL SCREEN) -->
+                            <div class="card search-card brsko-chat-card" style="margin: 0; background: rgba(8, 8, 12, 0.72) !important; border: 1px solid rgba(16, 185, 129, 0.28) !important; border-radius: 20px !important; padding: 16px !important; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(16, 185, 129, 0.08) !important; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; flex: 1; height: 100%;">
                                 <div class="chat-header" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed rgba(16, 185, 129, 0.2); padding-bottom: 8px;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <span class="status-blink"></span>
-                                        <h3 class="section-title" id="search-title" style="margin: 0; font-size: 13px; color: var(--color-primary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">🤖 Brsko AI Chat</h3>
+                                        <h3 class="section-title" id="search-title" style="margin: 0; font-size: 14px; color: var(--color-primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">🤖 Brsko AI Chat</h3>
                                     </div>
                                     <span style="font-size: 8px; color: rgba(255, 255, 255, 0.4); font-family: monospace; font-weight: 700;">MODEL: GEMINI 2.5</span>
                                 </div>
                                 
-                                <!-- Dynamic Chat Messages Box (Taller for deep messaging) -->
-                                <div class="home-chat-messages" id="home-chat-messages-box" style="height: 290px !important; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px; box-sizing: border-box; text-align: left; font-size: 11.5px; scrollbar-width: none;">
+                                <!-- Dynamic Chat Messages Box (Comfortably large and spacious) -->
+                                <div class="home-chat-messages" id="home-chat-messages-box" style="height: 420px !important; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px; box-sizing: border-box; text-align: left; font-size: 12px; scrollbar-width: none; flex: 1;">
                                     <div class="chat-msg message-ai">
                                         <strong>Brsko AI:</strong> Merhaba! Ben senin kişisel yapay zeka sağlık ve besin asistanınım. Biyometrik verilerine göre sana özel öneriler verebilirim. Herhangi bir gıdayı, kaloriyi veya diyet tavsiyesini sorabilirsin! ⚡
                                     </div>
@@ -580,98 +577,44 @@
                                 
                                 <!-- Quick Chat Chips (Öneri Sorular) -->
                                 <div class="chat-chips-row" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; -ms-overflow-style: none;">
-                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🥑 Avokado faydalı mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🥑 Avokado?</button>
-                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🍬 Şeker kilo aldırır mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🍬 Şeker?</button>
-                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🏋️ Kaç gr protein almalıyım?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 4px 10px; font-size: 9px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🏋️ Protein?</button>
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🥑 Avokado faydalı mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 5px 12px; font-size: 9.5px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🥑 Avokado?</button>
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🍬 Şeker kilo aldırır mı?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 5px 12px; font-size: 9.5px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🍬 Şeker?</button>
+                                    <button class="chat-chip" onclick="sendQuickHomeChatMessage('🏋️ Kaç gr protein almalıyım?')" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 20px; padding: 5px 12px; font-size: 9.5px; color: var(--color-primary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);">🏋️ Protein?</button>
                                 </div>
                                 
                                 <!-- Chat Input Box -->
-                                <div class="search-box">
-                                    <input type="text" id="home-chat-input-field" placeholder="Fıstık ezmesi kilo aldırır mı?..." onkeypress="handleHomeChatKeyPress(event)">
-                                    <button class="search-btn" onclick="sendHomeUserChatMessage()" id="btn-search-txt" style="background: linear-gradient(135deg, var(--color-primary), #059669) !important; color: white !important; border-radius: 8px;">Sor</button>
+                                <div class="search-box" style="margin-top: 4px;">
+                                    <input type="text" id="home-chat-input-field" placeholder="Sağlık koçuna soru sor..." onkeypress="handleHomeChatKeyPress(event)" style="font-size: 12px; height: 42px;">
+                                    <button class="search-btn" onclick="sendHomeUserChatMessage()" id="btn-search-txt" style="background: linear-gradient(135deg, var(--color-primary), #059669) !important; color: white !important; border-radius: 8px; height: 42px; font-size: 12px; padding: 0 16px;">Sor</button>
                                 </div>
                             </div>
 
-                            <!-- 📷 LAUNCH LIVE CAMERA ACTION CARD -->
-                            <div class="card wellness-card camera-launcher-card" style="margin-top: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(20, 20, 25, 0.8) 100%); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 16px; padding: 12px 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); text-align: center; display: flex; flex-direction: row; gap: 12px; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; align-items: center; gap: 10px; text-align: left;">
-                                    <span style="font-size: 24px; animation: floatEmoji 3s ease-in-out infinite;">📷</span>
-                                    <div>
-                                        <h4 style="color: var(--color-primary); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">SİBER GIDA KAMERASI</h4>
-                                        <p style="font-size: 9px; color: var(--color-text-sub); margin: 2px 0 0 0; line-height: 1.3;">Gıdaları siber tarayıcı ile tarayarak analiz edin.</p>
-                                    </div>
+                            <!-- Hidden Scanner DOM Assets to avoid JavaScript Null-Pointer Errors -->
+                            <div class="hidden-scanner-assets" style="display: none !important;">
+                                <div class="neon-divider-logo">BRSKO AI</div>
+                                <div class="card wellness-card camera-launcher-card">
+                                    <button class="btn-activate-cam-launcher" id="btn-activate-cam-txt"></button>
                                 </div>
-                                <button class="btn-activate-cam-launcher siber-btn-accent" onclick="initCamera(); document.getElementById('camera-viewport').scrollIntoView({ behavior: 'smooth' });" style="width: 80px; height: 32px; font-size: 10px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), #10b981); color: #050508; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25); transition: all 0.3s ease;">
-                                    AÇ 🚀
-                                </button>
-                            </div>
-
-                            <!-- Dynamic Early Warning Banner (Amber glowing, rich emojis) -->
-                            <div id="early-warning-banner" class="early-warning-banner hidden" style="margin-top: 10px;">
-                                <div class="warning-content">
-                                    <span class="warning-icon">⚠️🚨</span>
-                                    <span id="early-warning-txt">Son 1 Ücretsiz Analiz Hakkınız Kaldı! Kesintisiz siber tarama ve limitsiz AI koçluğu için şimdi Premium'a geçin! ⚡💎</span>
+                                <div id="early-warning-banner" class="early-warning-banner">
+                                    <span id="early-warning-txt"></span>
+                                    <button class="btn-warning-action"></button>
                                 </div>
-                                <button class="btn-warning-action" onclick="switchView('paywall')">Premium Yükselt 👑</button>
-                            </div>
-
-                            <!-- Live Camera Scanner Simulator -->
-                            <div class="scanner-container" style="margin-top: 10px;">
-                                <!-- Real Webcam Video or Dynamic Interactive Placeholder -->
-                                <div class="camera-viewport" id="camera-viewport">
-                                    <video id="webcam-stream" autoplay playsinline muted class="hidden"></video>
-                                    <button class="btn-scan-capture hidden" id="btn-scan-capture" onclick="captureAndAnalyze()">🎯 Besini Analiz Et</button>
-                                    <div class="camera-fallback" id="camera-fallback-screen">
-                                        <div class="fallback-glow"></div>
-                                        <span class="scanner-radar"></span>
-                                        <span class="camera-icon">📷</span>
-                                        <p id="cam-fallback-txt">Kamera izni bekleniyor veya simülasyon aktif...</p>
-                                    </div>
-                                    
-                                    <!-- Scan Laser Line Effect -->
-                                    <div class="laser-scanner" id="laser-line"></div>
-                                    
-                                    <!-- Dynamic Scanning Target Overlay -->
-                                    <div class="scanner-corners">
-                                        <div class="corner tl"></div>
-                                        <div class="corner tr"></div>
-                                        <div class="corner bl"></div>
-                                        <div class="corner br"></div>
-                                    </div>
-
-                                    <!-- Futuristic Cyber Scan Overlay Grid and HUD Lock-on Telemetry -->
-                                    <div class="cyber-scan-overlay hidden" id="cyber-scan-overlay">
-                                        <!-- Real-time 3D Simulated Metaverse Hologram Scanning Canvas -->
-                                        <canvas id="metaverse-scan-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.85;"></canvas>
-                                        <div class="cyber-scan-grid" style="z-index: 1;"></div>
-                                        <div class="cyber-hud-top" style="z-index: 2;">
-                                            <span class="hud-glitch-text">SYS STATUS: SCANNING BIOMASS...</span>
-                                            <span class="hud-coords" id="hud-live-coords">LOCK COORDS: X:42.1 Y:19.8</span>
+                                <div class="scanner-container">
+                                    <div class="camera-viewport" id="camera-viewport">
+                                        <video id="webcam-stream" autoplay playsinline muted></video>
+                                        <button class="btn-scan-capture" id="btn-scan-capture"></button>
+                                        <div class="camera-fallback" id="camera-fallback-screen">
+                                            <p id="cam-fallback-txt"></p>
                                         </div>
-                                        <div class="cyber-target-bracket-box">
-                                            <div class="target-bracket-corner tl"></div>
-                                            <div class="target-bracket-corner tr"></div>
-                                            <div class="target-bracket-corner bl"></div>
-                                            <div class="target-bracket-corner br"></div>
-                                            <div class="target-radar-sweep"></div>
-                                            <span class="target-lock-label" id="cyber-target-label">ANALYZING MOLECULES...</span>
+                                        <div class="laser-scanner" id="laser-line"></div>
+                                        <div class="cyber-scan-overlay" id="cyber-scan-overlay">
+                                            <canvas id="metaverse-scan-canvas"></canvas>
+                                            <span id="cyber-target-label"></span>
+                                            <span id="hud-live-coords"></span>
                                         </div>
-                                        <div class="cyber-hud-bottom">
-                                            <div class="hud-metric-row">
-                                                <span class="hud-metric-lbl">HOLOGRAPHIC PROBE:</span>
-                                                <span class="hud-metric-val active-pulse">ONLINE</span>
-                                            </div>
-                                            <div class="hud-metric-row">
-                                                <span class="hud-metric-lbl">E-NUMBER SEARCH:</span>
-                                                <span class="hud-metric-val">SYNCED</span>
-                                            </div>
+                                        <div class="scanning-status-overlay" id="scan-loading-overlay">
+                                            <span id="scanning-label"></span>
                                         </div>
-                                    </div>
-
-                                    <!-- Scanning Info overlay -->
-                                    <div class="scanning-status-overlay hidden" id="scan-loading-overlay">
-                                        <div class="spinner"></div>
-                                        <span id="scanning-label">Yapay Zeka Analiz Ediyor...</span>
                                     </div>
                                 </div>
                             </div>
